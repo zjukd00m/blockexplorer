@@ -7,7 +7,7 @@ export default function Index() {
 
 
     return (
-        <div className="mt-10 mx-[120px]">
+        <div className="mt-10">
             <div className="w-3/6">
                 <p className="text-[19.68px] font-medium"> The Ethereum Blockchain Explorer </p>
                 <SearchBar 

@@ -95,7 +95,6 @@ export async function getCurrentEtherPrice() {
     try {
         const res = await axios.get("https://api.coingecko.com/api/v3/coins/ethereum");
 
-
         if (res.status !== 200) {
             return null;
         }

@@ -1,6 +1,7 @@
+import { useNavigate } from "react-router-dom"; 
 import { useEffect, useState } from "react"
 import { AlchemySubscription } from "alchemy-sdk";
-import { DocumentTextIcon, CubeIcon } from "@heroicons/react/24/solid";
+import { DocumentTextIcon, CubeIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
 import alchemy from "../../utils/alchemyClient";
 
 const Tx = [
@@ -403,6 +404,7 @@ const Tx = [
 export default function TxList(props) {
     const { txType, title } = props;
     const [itemList, setItemList] = useState(Tx);
+    const navigate = useNavigate();
 
     if (txType !== "BLOCK" && txType !== "TX") {
         throw new Error("Invalid txType value");
@@ -562,8 +564,15 @@ export default function TxList(props) {
                     })
                 }
             </div>
-            <div className="bg-[#F8F9FA] h-[50px] flex justify-center items-center">
-                <p className="uppercase text-[12px] text-center"> View all { txType === "BLOCK" ? "blocks" : "transactions" } </p>
+            <div className="bg-[#F8F9FA] h-[50px] flex justify-center items-center gap-2" onClick={() => {
+                if (txType === "BLOCK") {
+                    navigate("/blocks");
+                } else {
+                    navigate("/txs");
+                }
+            }}>
+                <p className="uppercase text-[12px] text-center hover:text-blue-400"> View all { txType === "BLOCK" ? "blocks" : "transactions" } </p>
+                <ArrowRightIcon height="12" width="12" className="hover:text-blue-400" />
             </div>
         </div>
     )

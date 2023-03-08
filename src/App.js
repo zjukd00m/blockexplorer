@@ -1,5 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages";
+import Blocks from "./pages/blocks";
+import Transactions from "./pages/transactions";
+import TopBar from "./components/TopBar";
+import Navbar from "./components/Navbar";
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -14,9 +18,16 @@ import Index from "./pages";
 function App() {
 
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-    </Routes>
+    <div className="flex flex-col mx-[120px]">
+      <TopBar />
+      <hr className="bg-[#e9ecef] w-full" />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/blocks" element={<Blocks />} />
+        <Route path="/txs" element={<Transactions />} />
+      </Routes>
+    </div>
   )
 }
 
