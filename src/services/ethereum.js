@@ -1,3 +1,5 @@
+import { Utils,  } from "alchemy-sdk";
+import axios from "axios";
 import alchemy from "../utils/alchemyClient";
 
 export async function searchEthereum(searchQ, searchBy) {
@@ -36,4 +38,77 @@ export async function searchEthereum(searchQ, searchBy) {
     }
 
     return res;
+}
+
+export async function getTotalTransactions() {
+    const lastBlockNumber = await alchemy.core.getBlockNumber();
+    let lastBlock = await alchemy.core.getBlockWithTransactions(lastBlockNumber);
+
+    let txs = lastBlock.transactions.length;
+
+    while(lastBlock.parentHash !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+        lastBlock = await alchemy.core.getBlockWithTransactions(lastBlock.parentHash);
+        txs += lastBlock.transactions.length;
+    }
+
+    return txs;
+}
+
+export async function getAvgGasPrice(inUSD = false) {
+    const gasPriceWei = await alchemy.core.getGasPrice();
+    
+    const gasPriceGwei = Utils.formatUnits(gasPriceWei, "gwei");
+
+    if (inUSD) {
+        const etherUSDPrice = await getCurrentEtherPrice();
+
+        return etherUSDPrice * gasPriceWei * (1/10**9);
+    }
+
+    return gasPriceGwei;
+}
+
+export async function getLastSafeBlock() {
+    const latestBlockNumber = await alchemy.core.getBlockNumber();
+    
+    return latestBlockNumber; 
+}
+
+/**
+ * Given a block object data, get the transaction cost of each one
+ * @param {*} blockData 
+ * @returns {*} The total of ethers spent in all the transactions included in the block 
+ */
+export async function getBlockTransactionsCost(blockData) {
+    const txData = await Promise.all(
+        blockData
+            .transactions
+            .map((txHash) => alchemy.core.getTransaction(txHash))
+        );
+
+    return txData
+        .map(({ value }) => Utils.formatUnits(value, "ether") )
+        .reduce((acc, txValue) => acc + txValue, 0);
+}
+
+export async function getCurrentEtherPrice() {
+    try {
+        const res = await axios.get("https://api.coingecko.com/api/v3/coins/ethereum");
+
+
+        if (res.status !== 200) {
+            return null;
+        }
+
+        if (!res.data?.tickers?.length) {
+            return null;
+        }
+
+        const { converted_last } = res.data.tickers.find(({ target }) => target === "USD" );
+
+        return converted_last.usd;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
 }

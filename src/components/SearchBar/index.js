@@ -66,7 +66,7 @@ export default function SearchBar(props) {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full bg-white">
             <div>
                 {
                     leftInputItem ? (
