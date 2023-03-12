@@ -91,6 +91,32 @@ export async function getBlockTransactionsCost(blockData) {
         .reduce((acc, txValue) => acc + txValue, 0);
 }
 
+export async function getBlocksWithData(amount, beforeBlockNumber) {
+
+    let lastBlock;
+
+    if (!beforeBlockNumber) {
+        lastBlock = await getLastSafeBlock();
+    } else {
+        lastBlock = beforeBlockNumber;
+    }
+
+    // Generate the block numbers starting from the last one
+    const blockNumbers = Array(amount).fill().map((_, idx) => lastBlock - idx);
+
+    console.log("The block numbers");
+    console.log(blockNumbers);
+
+    // Get the data from all the blocks
+    // const blocks = await Promise.all(blockNumbers.map((blockN) => alchemy.core.getBlock(blockN)));
+
+    // return blocks;
+}
+
+/**
+ * Fetch the current price of ether in usd using the coingecko API
+ * @returns The price of ETH in USD
+ */
 export async function getCurrentEtherPrice() {
     try {
         const res = await axios.get("https://api.coingecko.com/api/v3/coins/ethereum");

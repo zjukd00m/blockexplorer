@@ -10,3 +10,19 @@
 body {
   font-family: "Roboto", sans-serif;
 }
+
+.social-footer {
+  padding-top: 0.5rem;
+}
+
+.app-container,
+.social-footer {
+  margin: 0 30px 0 30px;
+}
+
+@media (max-width: 1023px) {
+  .app-container,
+  .social-footer {
+    margin: 0 120px 0 120px;  
+  }
+}

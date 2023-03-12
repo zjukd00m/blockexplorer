@@ -4,6 +4,7 @@ import Blocks from "./pages/blocks";
 import Transactions from "./pages/transactions";
 import TopBar from "./components/TopBar";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -18,15 +19,20 @@ import Navbar from "./components/Navbar";
 function App() {
 
   return (
-    <div className="flex flex-col mx-[120px]">
-      <TopBar />
-      <hr className="bg-[#e9ecef] w-full" />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/blocks" element={<Blocks />} />
-        <Route path="/txs" element={<Transactions />} />
-      </Routes>
+    <div className="">
+      <div className="app-container flex flex-col">
+        <TopBar />
+        <hr className="bg-[#e9ecef] w-full" />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/blocks" element={<Blocks />} />
+          <Route path="/txs" element={<Transactions />} />
+        </Routes>
+      </div>
+      <div className="mt-5">
+        <Footer />
+      </div>
     </div>
   )
 }

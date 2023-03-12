@@ -1,6 +1,43 @@
 import { useEffect, useState } from "react";
 import { searchEthereum } from "../../services/ethereum";
 
+function SearchFiltersDropdown({ styles }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [filter, setFilter] = useState("All Filters");
+
+    const searchFilters = [
+        "All Filters",
+        "Addresses",
+        "Tokens",
+        "Name Tags",
+        "Labels",
+        "Websites",
+    ];
+
+    return (
+        <div className={`${styles} rounded-md block w-[170px] relative`}>
+            <div className="flex justify-between border border-gray-600 p-1.5 items-center gap-4 w-full" onClick={() => setIsOpen(!isOpen)}>
+                <p className="text-sm"> { filter } </p>
+                <i className="fa-solid fa-chevron-down fa-xs"></i>
+            </div>
+            {
+                isOpen ? (
+                    <div className="top-[2rem] z-10 border border-gray-600 absolute bg-white w-full">
+                        {
+                            searchFilters.map((filter_) => (
+                                <p className="text-[0.75rem] hover:bg-blue-400 hover:text-white p-1" onClick={() => {
+                                    setFilter(filter_);
+                                    setIsOpen(false);
+                                }}> { filter_ } </p>
+                            ))
+                        }
+                    </div>
+                ) : null
+            }
+        </div>
+    )
+}
+
 export default function SearchBar(props) {
     const { autocomplete, leftInputItem, rightInputItem, placeholder } = props;
     const [searchQ, setSearchQ] = useState("");
@@ -66,21 +103,23 @@ export default function SearchBar(props) {
     }
 
     return (
-        <div className="w-full bg-white">
-            <div>
+        <div className="w-full bg-white rounded-md p-1">
+            <div className="flex items-center gap-2">
                 {
                     leftInputItem ? (
-                        { leftInputItem }
+                       <SearchFiltersDropdown styles={"hover:shadow-lg"} /> 
                     ) : null
                 }
                 <input 
-                    className="w-full px-2 py-1 box-border" 
+                    className={`w-full px-2 py-1 box-border rounded-md active:shadow-lg`} 
                     placeholder={placeholder} 
                     onChange={(e) => setSearchQ(e.target.value)}
                 />
                 {
                     rightInputItem ? (
-                        { rightInputItem }
+                        <div className="bg-blue-800 p-1 rounded-md text-white">
+                            <i className="fa-solid fa-magnifying-glass p-1 hover:opacity-70"></i>
+                        </div>
                     ) : null
                 }
             </div>
