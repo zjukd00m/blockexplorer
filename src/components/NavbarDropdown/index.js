@@ -5,9 +5,9 @@ export default function NavbarDropdown({ name, items }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="flex flex-col">
-            <div className="flex items-center gap-2" onClick={() => setIsExpanded(!isExpanded)}>
-                <p className="text-[14.5px]"> { name } </p>
+        <div className="flex flex-col" onMouseEnter={() => setIsExpanded(true)} onMouseLeave={() => setIsExpanded(false)}>
+            <div className="flex items-center gap-2">
+                <p className="text-[14.5px] hover:text-[#1e40af]"> { name } </p>
                 {
                     items?.length ? <ChevronDownIcon height="15" width="15" /> : null
                 }
@@ -15,12 +15,16 @@ export default function NavbarDropdown({ name, items }) {
             <div className="relative">
                 {
                     items?.length && isExpanded ? (
-                        <ul className="flex flex-col gap-1 absolute bg-[#f8f8f8] w-[250px] rounded-b-2xl">
+                        <ul className="flex flex-col bg-white absolute w-[250px] rounded-b-2xl">
                             {
                                 items.map(({ name }, key) => (
-                                    <li key={key} className="px-6 py-[0.3rem]">
+                                    <li key={key} className="p-1">
                                         {
-                                            name === "SEPARATOR" ? <hr className="bg-[#e9ecef] w-full" /> : <p className="text-[.8203125rem]"> { name } </p>
+                                            name === "SEPARATOR" ? <hr className="bg-[#e9ecef] w-full" /> : (
+                                                <div className="hover:bg-[#c8d0db] p-1 rounded-lg">
+                                                    <p className="text-[.8203125rem]"> { name } </p>
+                                                </div>
+                                            )
                                         }
                                     </li>  
                                 ))

@@ -5,6 +5,7 @@ import Transactions from "./pages/transactions";
 import TopBar from "./components/TopBar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Address from "./pages/address";
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -27,7 +28,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/blocks" element={<Blocks />} />
-          <Route path="/txs" element={<Transactions />} />
+          <Route path="/tx" element={<Transactions />} />
+          <Route path="/address/:userAddress" element={<Address />} />
         </Routes>
       </div>
       <div className="mt-5">
