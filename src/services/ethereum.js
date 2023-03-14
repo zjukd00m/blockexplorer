@@ -100,33 +100,37 @@ export async function getBlockTransactionsCost(blockData) {
 }
 
 // TODO: Find out how to get the block reward
-export async function getBlocksWithData(amount, beforeBlockNumber = false) {
+export async function getBlocksWithData(amount, beforeBlockNumber) {
+    try {
+        let lastBlock;
 
-    let lastBlock;
-
-    if (!beforeBlockNumber) {
-        lastBlock = await getLastSafeBlock();
-    } else {
-        lastBlock = beforeBlockNumber;
-    }
-
-    // Generate the block numbers starting from the last one
-    const blockNumbers = Array(amount).fill().map((_, idx) => lastBlock - idx);
-
-    // Get the data from all the blocks
-    const blocks = await Promise.all(blockNumbers.map((blockN) => alchemy.core.getBlockWithTransactions(blockN)));
-
-    // Get the miner's data
-    const blocksWithMiners = await Promise.all(blocks.map(async (block) => {
-        try {
-            const minerENS = await alchemy.core.lookupAddress(block.miner);
-            return { ...block, miner: minerENS || block.miner, value: 0.99 }
-        } catch (e) {
-            return block;
+        if (!beforeBlockNumber) {
+            lastBlock = await getLastSafeBlock();
+        } else {
+            lastBlock = beforeBlockNumber;
         }
-    }));
 
-    return blocksWithMiners;
+        // Generate the block numbers starting from the last one
+        const blockNumbers = Array(amount).fill().map((_, idx) => lastBlock - idx);
+
+        // Get the data from all the blocks
+        const blocks = await Promise.all(blockNumbers.map((blockN) => alchemy.core.getBlockWithTransactions(blockN)));
+
+        // Get the miner's data
+        const blocksWithMiners = await Promise.all(blocks.map(async (block) => {
+            try {
+                const minerENS = await alchemy.core.lookupAddress(block.miner);
+                return { ...block, miner: minerENS || block.miner, value: 0.99 }
+            } catch (e) {
+                return block;
+            }
+        }));
+
+        return blocksWithMiners;
+    } catch(e) {
+        console.error(e);
+        return null;
+    }
 }
 
 // Get the given amount of tx of the latest mined block
@@ -143,12 +147,70 @@ export async function getTxWithData(amount) {
                 return {
                     ...tx, 
                     timestamp: block[0].timestamp, 
-                    value: value < 0 ? 0 : value,
+                    value: value.toFixed(5),
                 }
             });
 
         return txWithData;
     } catch (e) {
+        return null;
+    }
+}
+
+// Fetch the given amount of tx. If the amount of tx is higher than
+// the ones the first block has, tx are taken from the previous ones
+export async function getTxList(amount, page) {
+    try {
+       let block = await getBlocksWithData(1);
+       
+       if (!block?.length) return null;
+
+       let blockTxs = block[0].transactions;
+
+       if (blockTxs.length < amount) {
+        // When the block txs are less than the amount keep asking for blocks
+        while (blockTxs.length < amount) {
+                const previousBlock = await getBlocksWithData(1, block[0].number); 
+
+                if (!previousBlock?.length) break;
+
+                const prevBlockTxs = previousBlock[0].transactions;
+
+                // When the previous block length + the current tx length is greater
+                // than the amount
+                if (blockTxs.length + prevBlockTxs.length > amount) {
+                    const missingBlocks = prevBlockTxs.slice(0, prevBlockTxs.length - blockTxs.length);
+                    blockTxs = [...blockTxs, ...missingBlocks];
+                } else {
+                    // Append the previous block txs
+                    blockTxs = [...blockTxs, ...prevBlockTxs];
+                }
+            } 
+
+            // Get the sender and receiver tx ENS address
+            blockTxs = await Promise.all(blockTxs.map(async (tx) => {
+                let ensFrom = tx.from;
+                let ensTo = tx.to;
+
+                try {
+                    ensFrom = await alchemy.core.lookupAddress(tx.from);
+                } catch (e) {}
+
+                try {
+                    ensTo = await alchemy.core.lookupAddress(tx.to);
+                } catch (e) {}
+
+                return { ...tx, from: ensFrom, to: ensTo };
+            }));
+
+            return blockTxs;
+        }
+
+        // When the block txs are more than the amount of txs
+        return blockTxs.slice(0, amount);
+
+    } catch (e) {
+        console.error(e);
         return null;
     }
 }
