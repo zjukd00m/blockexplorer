@@ -17,8 +17,8 @@ export default function Table({
     })
 
     return (
-        <div className="border border-gray-200 rounded-md p-4">
-            <table className="w-full">
+        <div className="border border-gray-200 rounded-md p-4 overflow-x-auto">
+            <table className="w-full min-w-full">
                 <thead className="border-b">
                     {
                         table.getHeaderGroups().map((headerGroup) => (
@@ -36,13 +36,13 @@ export default function Table({
                         ))
                     }
                 </thead>
-                <tbody className="">
+                <tbody className="divide-y divide-gray-200">
                     {
                         table.getRowModel().rows.map((row) => (
-                            <tr key={row.id} className="border-b hover:bg-[#f9f9f9]">
+                            <tr key={row.id} className=" hover:bg-[#f9f9f9]">
                                 {
                                     row.getVisibleCells().map((cell) => (
-                                        <td key={cell.id} className="py-2.5 text-[0.9062rem] text-left">
+                                        <td key={cell.id} className="py-2.5 text-[0.9062rem] text-left whitespace-wrap">
                                             { flexRender(cell.column.columnDef.cell, cell.getContext()) }
                                         </td>
                                     ))

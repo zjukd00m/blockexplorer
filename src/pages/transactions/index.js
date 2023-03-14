@@ -16,10 +16,7 @@ export default function Transactions() {
     const columns = [
         columnHelper.accessor("hash", {
             header: () => <span> Txn Hash </span>,
-            cell: (info) => <Link to={`/tx/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] flex"> { info.getValue() } </Link>,
-            maxSize: 50,
-            size: 50,
-            minSize: 50,
+            cell: (info) => <Link to={`/tx/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>,
         }),
         columnHelper.accessor("method", {
             header: () => <span> Method </span>,
@@ -35,11 +32,11 @@ export default function Transactions() {
         }),
         columnHelper.accessor("from", {
             header: () => <span> From </span>,
-            cell: (info) => <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block"> { info.getValue() } </Link>,
+            cell: (info) => <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>,
         }),
         columnHelper.accessor("to", {
             header: () => <span> To </span>,
-            cell: (info) => <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block"> { info.getValue() } </Link>,
+            cell: (info) => <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>,
         }),
         columnHelper.accessor("value", {
             header: () => <span> Value </span>,
