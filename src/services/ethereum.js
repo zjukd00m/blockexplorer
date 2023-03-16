@@ -215,6 +215,33 @@ export async function getTxList(amount, page) {
     }
 }
 
+export async function getBlock(blockNumber) {
+    try {
+        const block = await alchemy.core.getBlock(Number(blockNumber));
+        
+        let ens = "";
+
+        try {
+            ens = await alchemy.core.lookupAddress(block.miner);
+
+            if (!ens) {
+                ens = block.miner;
+            }
+        } catch (e) {
+            ens = block.miner;
+        }
+
+        console.log("ENS");
+        console.log(ens);
+
+        return {...block, miner: ens};
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+
 /**
  * Fetch:
  * - The current price of ether in usd using the coingecko API

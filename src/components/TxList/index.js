@@ -136,7 +136,7 @@ export default function TxList(props) {
                                                 <div className="flex flex-col">
                                                     <p className="text-[#1e40af] cursor-pointer" onClick={() => {
                                                         if (number) {
-                                                            navigate(`/blocks/${number}`);
+                                                            navigate(`/block/${number}`);
                                                         } else {
                                                             navigate(`/tx/${hash}`);
                                                         }

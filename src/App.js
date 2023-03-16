@@ -6,6 +6,7 @@ import TopBar from "./components/TopBar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Address from "./pages/address";
+import Block from "./pages/block";
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -21,13 +22,14 @@ function App() {
 
   return (
     <div className="">
-      <div className="app-container flex flex-col">
+      <div className="app-container flex flex-col 2xl:mx-[120px]">
         <TopBar />
         <hr className="bg-[#e9ecef] w-full" />
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/blocks" element={<Blocks />} />
+          <Route path="/block/:blockNumber" element={<Block />} />
           <Route path="/tx" element={<Transactions />} />
           <Route path="/address/:userAddress" element={<Address />} />
         </Routes>
