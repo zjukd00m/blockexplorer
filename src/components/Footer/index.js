@@ -87,7 +87,7 @@ const pAsSection = [
 export default function Footer() {
     return (
         <div className="bg-[#f8f9fa]">
-            <div className="social-footer">
+            <div className="social-footer 2xl:mx-[120px] pt-1">
                 {/* Social Footer */}
                 <div className="flex content-center justify-between my-4">
                     <div className="flex gap-5">

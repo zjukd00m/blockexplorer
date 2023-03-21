@@ -1,7 +1,6 @@
 import { Utils,  } from "alchemy-sdk";
 import axios from "axios";
 import alchemy from "../utils/alchemyClient";
-import { getTimeDifferenceInSeconds } from "../utils/time";
 
 export async function searchEthereum(searchQ, searchBy) {
     let res = null;
@@ -235,6 +234,61 @@ export async function getBlock(blockNumber) {
         console.log(ens);
 
         return {...block, miner: ens};
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export async function getTx(txHash) {
+    try {
+        const tx = await alchemy.core.getTransaction(txHash);
+        
+        if (!tx) return null;
+
+        return tx;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export async function getAddressData(address) {
+    try {
+        let userBalance = await alchemy.core.getBalance(address);
+
+        const tokenBalances = await alchemy.core.getTokenBalances(address);
+        
+        const firstTxn = "";
+        const lastTxn = "";
+
+        const etherPrice = await getCurrentEtherPrice();
+
+        if (!etherPrice) return;
+
+        const { ethPriceUSD } = etherPrice;
+        
+        userBalance = Utils.formatUnits(userBalance, "ether");
+
+        const xx = await alchemy.core.getTokensForOwner(address);
+
+        console.log("----")
+        console.log(xx)
+        console.log("----")
+        
+        const txCount = await alchemy.core.getTransactionCount(address);
+        
+        return {
+            userBalance,
+            ethValueUSD: (userBalance * ethPriceUSD).toFixed(2),
+            firstTxn,
+            lastTxn,
+            tokenBalances,
+            txCount,
+        }
+
+
+
     } catch (e) {
         console.error(e);
         return null;
