@@ -253,15 +253,23 @@ export async function getTx(txHash) {
     }
 }
 
+export async function getTokenMetaData(tokenAddress) {
+    try {
+        const tokenMetadata = await alchemy.core.getTokenMetadata(tokenAddress);
+
+        return tokenMetadata;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
 export async function getAddressData(address) {
     try {
         let userBalance = await alchemy.core.getBalance(address);
 
         const tokenBalances = await alchemy.core.getTokenBalances(address);
         
-        const firstTxn = "";
-        const lastTxn = "";
-
         const etherPrice = await getCurrentEtherPrice();
 
         if (!etherPrice) return;
@@ -270,25 +278,14 @@ export async function getAddressData(address) {
         
         userBalance = Utils.formatUnits(userBalance, "ether");
 
-        const xx = await alchemy.core.getTokensForOwner(address);
-
-        console.log("----")
-        console.log(xx)
-        console.log("----")
-        
         const txCount = await alchemy.core.getTransactionCount(address);
         
         return {
             userBalance,
             ethValueUSD: (userBalance * ethPriceUSD).toFixed(2),
-            firstTxn,
-            lastTxn,
             tokenBalances,
             txCount,
         }
-
-
-
     } catch (e) {
         console.error(e);
         return null;

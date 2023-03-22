@@ -177,7 +177,7 @@ export default function TxList(props) {
                 if (txType === "BLOCK") {
                     navigate("/blocks");
                 } else {
-                    navigate("/tx");
+                    navigate("/txs");
                 }
             }}>
                 <div className="hover:text-[#1e40af] flex items-center gap-2">

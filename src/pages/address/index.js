@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import UserTokens from "../../components/UserTokens";
 import { getAddressData } from "../../services/ethereum";
 
 export default function Address() {
     const [ethBalance, setEthBalance] = useState(0);
     const [ethValue, setEthValue] = useState(0);
-    const [firstTxnHash, setFirstTxnHash] = useState("");
-    const [lastTxnHash, setLastTxnHash] = useState("");
-    const [lastTxnTimestamp, setLastTxnTimestamp] = useState("");
-    const [firstTxnTimestamp, setFirstTxnTimestamp] = useState("");
     const [txCount, setTxCount] = useState();
+    const [tokenBalances, setTokenBalances] = useState([]);
     const { userAddress } = useParams();
 
     useEffect(() => {
@@ -20,69 +18,63 @@ export default function Address() {
 
             if (!addressData) return;
 
-            const { userBalance, firstTxn, lastTxn, tokenBalances, ethValueUSD, txCount } = addressData;
-
-            console.log("Token balances");
-            console.log(tokenBalances);
+            const { 
+                userBalance, 
+                tokenBalances: userTokenBalances, 
+                ethValueUSD, 
+                txCount 
+            } = addressData;
 
             setEthBalance(userBalance);
             setEthValue(ethValueUSD);
 
-            setFirstTxnHash(firstTxn);
-            setLastTxnHash(lastTxn);
-
-            setFirstTxnTimestamp();
-            setLastTxnTimestamp();
-
             setTxCount(txCount);
+
+            setTokenBalances(userTokenBalances);
         })();
     }, [userAddress]);
 
     return (
         <div className="">
             <div className="">
-                <p className="inline"> Address <span className=""> { userAddress } </span> </p>
-                <i class="fa-regular fa-clone fa-xs ml-1 text-slate-400"></i>
+                <p className="inline text-md"> Address <span className="text-sm ml-3"> { userAddress } </span> </p>
+                <i className="fa-regular fa-clone fa-xs ml-2 text-slate-500"></i>
             </div>
             <hr className="bg-[#e9ecef] w-full my-5" />
-            <div className="grid grid-cols-2">
-                <div className="">
-                    <p className="font-semibold"> Overview </p>         
+            <div className="">
+                <div className="flex justify-between">
                     <div className="">
-                        <p className="uppercase text-sm"> Eth balance </p>
+                        <p className="uppercase text-[12px] text-gray-500"> Eth balance </p>
                         <div className="">
                             <i class="fa-brands fa-ethereum fa-sm text-slate-400"></i>
-                            <p className="inline"> { ethBalance } <span> ETH </span> </p>
+                            <p className="inline text-[0.9062rem]"> { ethBalance } <span> ETH </span> </p>
                         </div>
                     </div>
                     <div className="">
-                        <p className="uppercase text-sm"> Eth value </p>
+                        <p className="uppercase text-[12px] text-gray-500"> Eth value </p>
                         <div className="">
-                            <p className="inline"> { ethValue } <span> ( <i class="fa-solid fa-at fa-xs text-black"></i> { ethValue } / ETH ) </span> </p>
+                            <p className="inline text-[0.9062rem]"> { ethValue } <span className="text-[0.875rem]"> ( <i class="fa-solid fa-at fa-xs text-black"></i> { ethValue } / ETH ) </span> </p>
+                        </div>
+                    </div>
+                    <div className="">
+                        <div className="">
+                            <p className="uppercase text-[12px] text-gray-500"> Total Transactions </p>
+                            <p className="inline text-[0.9062rem]"> { txCount } </p>
                         </div>
                     </div>
                 </div>
-                <div className="">
-                    <p className="font-semibold"> More Info </p>
-                    <div className="">
-                        <p className="uppercase text-sm"> Total Transaction </p>
-                        <p className="inline text-sm"> { txCount } </p>
-                    </div>
-                    <div className="">
-                        <p className="uppercase text-sm"> Last Txn Sent </p>
-                        <div className="">
-                            <Link to={`/tx/${lastTxnHash}`} className="inline text-sm"> { lastTxnHash } </Link>
-                            <p className="inline ml-3 text-sm"> { lastTxnTimestamp } </p>
+                {
+                    tokenBalances?.tokenBalances?.length ? (
+                        <div className="mt-10">
+                            <p className="uppercase text-xs text-left my-3"> Token Holdings </p>
+                            <UserTokens tokens={tokenBalances} />
                         </div>
-                    </div>
-                    <div className="">
-                        <p className="uppercase text-sm"> First Txn Sent </p>
-                        <div className="">
-                            <Link to={`/tx/${firstTxnHash}`} className="inline text-sm"> { firstTxnHash } </Link>
-                            <p className="inline ml-3 text-sm"> { firstTxnTimestamp } </p>
+                    ) : (
+                        <div className="mt-10">
+                            <p className="uppercase text-sm text-left my-3"> This address has no tokens </p>
                         </div>
-                    </div>
-                </div>
+                    )
+                }
             </div>
         </div>
     )
