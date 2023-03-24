@@ -1,7 +1,7 @@
-import { Utils } from "alchemy-sdk";
+import {  Utils } from "alchemy-sdk";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getBlock, getLastSafeBlock } from "../../services/ethereum";
+import { getLastSafeBlock, getRawBlockByNumber } from "../../services/ethereum";
 import { getTimeDifference, getTimeUTCFormatted } from "../../utils/time";
 
 export default function Block() {
@@ -40,29 +40,34 @@ export default function Block() {
     useEffect(() => {
         if (!blockNumber?.length) return;
         (async () => {
-            const block = await getBlock(blockNumber);
+            const result = await getRawBlockByNumber(blockNumber);
 
-            if (!block) return;
+            if (!result) return;
 
-            block.baseFeePerGas = `${Utils.formatUnits(block.baseFeePerGas, "ether")} ETH (${Utils.formatUnits(block.baseFeePerGas, "gwei")} Gwei)`;
+            const block_ = result.result;
+
+            block_.baseFeePerGas = `${Utils.formatUnits(block_.baseFeePerGas, "ether")} ETH (${Utils.formatUnits(block_.baseFeePerGas, "gwei")} Gwei)`;
             
-            block.gasLimit = Utils.formatUnits(block.gasLimit, "wei");
+            block_.gasLimit = Utils.formatUnits(block_.gasLimit, "wei");
 
-            block.gasUsed = Utils.formatUnits(block.gasUsed, "wei");
+            block_.gasUsed = Utils.formatUnits(block_.gasUsed, "wei");
 
-            block.timestamp = `${getTimeDifference(new Date(block.timestamp), new Date())} (${getTimeUTCFormatted(block.timestamp)})`;
+            block_.timestamp = Number(Utils.formatUnits(block_.timestamp, "wei"));
 
-            console.log(block._difficulty)
+            const utcStringTimestamp = getTimeUTCFormatted(block_.timestamp);
 
-            block._difficulty = Utils.formatUnits(block._difficulty, "wei");
+            block_.timestamp = `${getTimeDifference(new Date(Date(block_.timestamp)), new Date())} (${utcStringTimestamp})`;
 
-            console.log(block._difficulty)
+            block_._difficulty = Utils.formatUnits(block_.totalDifficulty, "wei");
 
-            if (block.extraData) {
-                block.extraData = Utils.toUtf8String(block.extraData);
+            block_.size = Utils.formatUnits(block_.size, "wei")
+
+            if (block_.extraData) {
+                const decodedExtraData = Utils.toUtf8String(block_.extraData);
+                block_.extraData = decodedExtraData + ` (Hex: ${block_.extraData})`;
             }
 
-            setBlock(block);
+            setBlock(block_);
         })();
     }, [blockNumber]);
 
@@ -106,14 +111,6 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Proposed On: </p>
-                    </div>
-                    <div className="flex">
-                        <p className="text-[0.9062rem]"> Block proposed on slot <span className="text-blue-900"> 6013122, </span> epoch <span className="text-blue-900"> 187910 </span> </p>
-                    </div>
-                </div>
-                <div className="flex justify-between p-2">
-                    <div className="flex">
                         <p className="text-[0.9062rem] text-gray-500"> Transactions: </p>
                     </div>
                     <div className="flex">
@@ -134,7 +131,7 @@ export default function Block() {
                         <p className="text-[0.9062rem] text-gray-500"> Block Reward: </p>
                     </div>
                     <div className="flex">
-                        <p className="text-[0.9062rem]"> 0.038960103745855092 ETH (0 + 0.466421072756348234 - 0.427460969010493142) </p>
+                        <p className="text-[0.9062rem]"> ... </p>
                     </div>
                 </div>
                 <div className="flex justify-between p-2">
@@ -150,7 +147,7 @@ export default function Block() {
                         <p className="text-[0.9062rem] text-gray-500"> Size: </p>
                     </div>
                     <div className="flex">
-                        <p className="text-[0.9062rem]"> 182,771 bytes </p>
+                        <p className="text-[0.9062rem]"> { block?.size } bytes </p>
                     </div>
                 </div>
                 <hr className="bg-[#e9ecef] w-full" />

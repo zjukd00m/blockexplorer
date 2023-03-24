@@ -1,6 +1,8 @@
-import { Utils,  } from "alchemy-sdk";
+import { toHex, Utils  } from "alchemy-sdk";
 import axios from "axios";
 import alchemy from "../utils/alchemyClient";
+
+const ALCHEMY_API_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
 
 export async function searchEthereum(searchQ, searchBy) {
     let res = null;
@@ -217,7 +219,7 @@ export async function getTxList(amount, page) {
 export async function getBlock(blockNumber) {
     try {
         const block = await alchemy.core.getBlock(Number(blockNumber));
-        
+
         let ens = "";
 
         try {
@@ -229,9 +231,6 @@ export async function getBlock(blockNumber) {
         } catch (e) {
             ens = block.miner;
         }
-
-        console.log("ENS");
-        console.log(ens);
 
         return {...block, miner: ens};
     } catch (e) {
@@ -245,6 +244,8 @@ export async function getTx(txHash) {
         const tx = await alchemy.core.getTransaction(txHash);
         
         if (!tx) return null;
+
+        console.log(tx)
 
         return tx;
     } catch (e) {
@@ -342,6 +343,42 @@ export async function getBtcEthPrice() {
         const btcEthPrice = res.data.market_data.current_price.btc;
 
         return btcEthPrice;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export async function getRawBlockByNumber(blockNumber) {
+    try {
+        const res = await axios.post(
+            `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+            JSON.stringify({
+                jsonrpc: "2.0",
+                method: "eth_getBlockByNumber",
+                params: [toHex(blockNumber), false],
+                id: 0
+            }),
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+
+        const data = res.data;
+
+        let ens = "";
+
+        try {
+            ens = await alchemy.core.lookupAddress(data.result.miner);
+
+            if (!ens) {
+                ens = data.result.miner;
+            }
+        } catch (e) {
+            ens = data.result.miner;
+        }
+
+        return {...data, result: { ...data.result, miner: ens }};
     } catch (e) {
         console.error(e);
         return null;

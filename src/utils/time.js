@@ -22,14 +22,14 @@ export function getTimeDifferenceInSeconds(start, end) {
 export function getTimeDifference(start, end) {
     const diff = Math.abs(end.getTime() - start.getTime());
     
-    const days = Math.floor(diff/(1000 * 60 * 60 * 24));
+    const days = (diff/(1000 * 60 * 60 * 24))
 
-    const hours = Math.floor((diff/(1000 * 60 * 60))) % 24;
+    const hours = (((diff/(1000 * 60 * 60)))) % 24
 
-    const minutes = Math.floor((diff/(1000 * 60)) % 60);
+    const minutes = ((diff/(1000 * 60))) % 60
 
-    const seconds = Math.floor((diff/(1000)) % 60);
-
+    const seconds = ((diff/(1000))) % 60
+    
     let format = "";
 
     if (days <= 0) {
@@ -62,7 +62,7 @@ export function getTimeDifference(start, end) {
 }
 
 export function getTimeUTCFormatted(timestamp) {
-    const datetime = new Date(timestamp);
+    const datetime = new Date(Date(timestamp));
 
     const year = datetime.getUTCFullYear();
     const month = datetime.getUTCMonth().toString();

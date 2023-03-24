@@ -1,5 +1,6 @@
 import { Utils } from "alchemy-sdk";
 import { useEffect, useState } from "react";
+import { Buffer } from "buffer";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getCurrentEtherPrice, getTx } from "../../services/ethereum";
 
@@ -11,12 +12,8 @@ export default function Transaction() {
 
 
     useEffect(() => {
-        console.log("The transaction hash");
-        console.log(txHash);
         (async () => {
             const txData = await getTx(txHash);
-            console.log("This is the tx data");
-            console.log(txData);
             if (!txData) return;
 
             const etherPrice = await getCurrentEtherPrice();
@@ -35,8 +32,12 @@ export default function Transaction() {
                 value: {
                     eth: etherPriceBase,
                     usd: etherPriceUSD,
-                }
+                },
+                maxFeePerGas: Utils.formatUnits(txData.maxFeePerGas, "gwei"),
+                maxPriorityFeePerGas: Utils.formatUnits(txData.maxPriorityFeePerGas, "gwei"),
             }
+
+            // console.log(Buffer.from(Utils.toUtf8Bytes(tx.data.slice(2,))).toString("utf-8"))
 
             setTx(tx_);
         })();
@@ -105,6 +106,31 @@ export default function Transaction() {
                 <div className="flex items-center justify-between p-1">
                     <p className="text-[0.9062rem]"> Gas Price: </p>
                     <p className="inline text-[0.9062rem]"> { tx?.gasPrice?.gwei } Gwei <span className=""> ({ tx?.gasPrice?.eth } ETH)  </span> </p>
+                </div>
+                <hr className="bg-[#e9ecef] w-full" />
+                <div className="flex items-center justify-between p-1">
+                    <p className="text-[0.9062rem]"> Gas Fees: </p>
+                    <div className="flex gap-3 items-center">
+                        <p className="text-[0.9062rem] text-gray-500"> Base: <span className="text-black"> { tx?.gasPrice?.gwei } Gwei </span> </p>
+                        |
+                        <p className="text-[0.9062rem] text-gray-500"> Max: <span className="text-black"> { tx?.maxFeePerGas } Gwei </span> </p>
+                        |
+                        <p className="text-[0.9062rem] text-gray-500"> Max Priority: <span className="text-black"> { tx?.maxPriorityFeePerGas } Gwei </span> </p>
+                    </div>
+                </div>
+                <div className="flex items-center justify-between p-1">
+                    <p className="text-[0.9062rem]"> Other Attributes: </p>
+                    <div className="flex gap-3 items-center">
+                        <div className="border border-slate-700 rounded-md p-[0.3rem] bg-[#f7f7f8]">
+                            <p className="text-xs text-gray-500"> Txn Type: <span className="font-semibold text-black"> { tx?.type } </span> </p>
+                        </div>
+                        <div className="border border-slate-700 rounded-md p-[0.3rem] bg-[#f7f7f8]">
+                            <p className="text-xs text-gray-500"> Nonce: <span className="font-semibold text-black"> { tx?.nonce } </span> </p>
+                        </div>
+                        <div className="border border-slate-700 rounded-md p-[0.3rem] bg-[#f7f7f8]">
+                            <p className="text-xs text-gray-500"> Position In Block: <span className="font-semibold text-black"> { tx?.transactionIndex } </span> </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
