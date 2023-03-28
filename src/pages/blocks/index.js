@@ -5,11 +5,15 @@ import { getBlocksWithData } from "../../services/ethereum";
 import { getTimeDifferenceInSeconds } from "../../utils/time";
 import { Link, NavLink } from "react-router-dom";
 
+
+
 export default function Blocks() {
     const [blocks, setBlocks] = useState([]);
     const [page, setPage] = useState(1);
     const [rows, setRows] = useState(25);
     const [lastBlock, setLastBlock] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const columnHelper = createColumnHelper();
 
@@ -48,10 +52,18 @@ export default function Blocks() {
     ];
 
     useEffect(() => {
+        // setLoading(true);
+        setError(false);
         (async () => {
             let parsedBlocks = [];
 
             const blocks_ = await getBlocksWithData(rows, lastBlock?.number ? lastBlock?.number - 1 : null);
+
+            if (!blocks_?.length) {
+                setError(true);
+                setLoading(false);
+                return;
+            }
 
             parsedBlocks = blocks_?.map((block_) => {
                 const age = getTimeDifferenceInSeconds(new Date(block_.timestamp), new Date());
@@ -78,6 +90,7 @@ export default function Blocks() {
             setBlocks(parsedBlocks);
             setLastBlock(parsedBlocks[parsedBlocks.length - 1]);
 
+            // setLoading(false);
         })();
     }, [page, rows]);
 
@@ -87,20 +100,23 @@ export default function Blocks() {
             <div className="mt-5 mb-10">
                 <hr className="bg-[#e9ecef] w-full" />
             </div>
-            <Table 
-                data={blocks} 
-                columns={columns} 
-                page={page} 
-                totalPages={100} 
-                onPageChange={(nPage) => {
-                    console.log(nPage);
-                    setPage(nPage);
-                }}
-                onRowSelect={(nRows) => {
-                    console.log(nRows);
-                    setRows(nRows);
-                }}
-            />
+            {
+                <Table 
+                    data={blocks} 
+                    columns={columns} 
+                    page={page} 
+                    totalPages={100} 
+                    loading={loading}
+                    onPageChange={(nPage) => {
+                        console.log(nPage);
+                        setPage(nPage);
+                    }}
+                    onRowSelect={(nRows) => {
+                        console.log(nRows);
+                        setRows(nRows);
+                    }}
+                />
+            }
         </div>
     )
 }

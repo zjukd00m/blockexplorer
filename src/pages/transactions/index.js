@@ -10,6 +10,8 @@ export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const [page, setPage] = useState(1);
     const [rows, setRows] = useState(25);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const columnHelper = createColumnHelper();
 
@@ -50,10 +52,16 @@ export default function Transactions() {
 
     // Fetch transactions from the service
     useEffect(() => {
+        // setLoading(true);
+        // setError(false);
        (async () => {
             const txs = await getTxList(rows);
 
-            if (!txs?.length) return;
+            if (!txs?.length) {
+                setLoading(false);
+                setError(true);
+                return;
+            }
 
             const parsedTxs = txs.map((tx) => {
                 const { timestamp, value } = tx;
@@ -74,10 +82,9 @@ export default function Transactions() {
                 }
             });
 
-            console.log("TXs (" + rows + ")");
-            console.log(parsedTxs);
-
             setTransactions(parsedTxs);
+
+            setLoading(false);
        })();
     }, [page, rows]);
 
@@ -92,6 +99,8 @@ export default function Transactions() {
                 columns={columns}
                 page={page}
                 totalPages={100}
+                loading={loading}
+                error={error}
                 onPageChange={(nPage) => {
                     setPage(nPage);
                 }}
