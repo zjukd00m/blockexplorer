@@ -3,12 +3,13 @@ import { createColumnHelper } from "@tanstack/react-table";
 import Table from "../../components/Table";
 import { getBlocksWithData } from "../../services/ethereum";
 import { getTimeDifferenceInSeconds } from "../../utils/time";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export default function Blocks() {
     const [blocks, setBlocks] = useState([]);
     const [page, setPage] = useState(1);
     const [rows, setRows] = useState(25);
+    const [lastBlock, setLastBlock] = useState(null);
 
     const columnHelper = createColumnHelper();
 
@@ -50,65 +51,32 @@ export default function Blocks() {
         (async () => {
             let parsedBlocks = [];
 
-            // Fetch the first blocks when the array is empty
-            if (!blocks?.length) {
-                const blocks_ = await getBlocksWithData(rows);
+            const blocks_ = await getBlocksWithData(rows, lastBlock?.number ? lastBlock?.number - 1 : null);
 
-                parsedBlocks = blocks_?.map((block_) => {
-                    const age = getTimeDifferenceInSeconds(new Date(block_.timestamp), new Date());
-                    const transactions = block_.transactions.length;
-                    const gasUsed = 1;
-                    const gasLimit = "30,000,000";
-                    const baseFee = "44.88 Gwei";
-                    const reward = "0.01 ETH";
-                    const burntFees = "0.486668";
-                    
-                    return {
-                        number: block_.number,
-                        age,
-                        transactions,
-                        miner: block_.miner,
-                        gasUsed,
-                        gasLimit,
-                        baseFee,
-                        reward,
-                        burntFees,
-                    }
-                });
-
-            } else {
-                // Fetch the blocks when the blocks array is not empty
-                const blocks_ = await getBlocksWithData(rows, blocks[0].number);
-
-                if (!blocks_?.length) return;
-
-                console.log("The blocks");
-                console.log(blocks_);
-
-                parsedBlocks = blocks_?.map((block_) => {
-                    const age = getTimeDifferenceInSeconds(new Date(block_.timestamp), new Date());
-                    const transactions = block_.transactions.length;
-                    const gasUsed = 1;
-                    const gasLimit = "30,000,000";
-                    const baseFee = "44.88 Gwei";
-                    const reward = "0.01 ETH";
-                    const burntFees = "0.486668";
-
-                    return {
-                        number: block_.number,
-                        age,
-                        transactions,
-                        miner: block_.miner,
-                        gasUsed,
-                        gasLimit,
-                        baseFee,
-                        reward,
-                        burntFees,
-                    }
-                });
-            }
+            parsedBlocks = blocks_?.map((block_) => {
+                const age = getTimeDifferenceInSeconds(new Date(block_.timestamp), new Date());
+                const transactions = block_.transactions.length;
+                const gasUsed = 1;
+                const gasLimit = "30,000,000";
+                const baseFee = "44.88 Gwei";
+                const reward = "0.01 ETH";
+                const burntFees = "0.486668";
+                
+                return {
+                    number: block_.number,
+                    age,
+                    transactions,
+                    miner: block_.miner,
+                    gasUsed,
+                    gasLimit,
+                    baseFee,
+                    reward,
+                    burntFees,
+                }
+            });
 
             setBlocks(parsedBlocks);
+            setLastBlock(parsedBlocks[parsedBlocks.length - 1]);
 
         })();
     }, [page, rows]);

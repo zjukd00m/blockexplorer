@@ -1,7 +1,7 @@
 import {  Utils } from "alchemy-sdk";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getLastSafeBlock, getRawBlockByNumber } from "../../services/ethereum";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { getLastSafeBlock, getRawBlockByNumberOrHash } from "../../services/ethereum";
 import { getTimeDifference, getTimeUTCFormatted } from "../../utils/time";
 
 export default function Block() {
@@ -27,6 +27,7 @@ export default function Block() {
         }
     }
 
+    // Set the last block in order to avoid going forward
     useEffect(() => {
         (async () => {
             const lastBlockNumber = await getLastSafeBlock();
@@ -37,10 +38,18 @@ export default function Block() {
         })();
     }, []);
     
+    // Get the block by number or by hash
     useEffect(() => {
         if (!blockNumber?.length) return;
+
+        let getBy = "";
+
+        if (blockNumber.match(/^\d+$/g)) getBy = "number";
+        else if (blockNumber.startsWith("0x")) getBy = "hash";
+
         (async () => {
-            const result = await getRawBlockByNumber(blockNumber);
+
+            const result = await getRawBlockByNumberOrHash(blockNumber, getBy);
 
             if (!result) return;
 
@@ -84,7 +93,7 @@ export default function Block() {
                         <p className="text-[0.9062rem] text-gray-500"> Block Height: </p>
                     </div>
                     <div className="flex gap-1">
-                        <p clasName="text-[0.9062rem]"> { block?.number } </p>
+                        <p className="text-[0.9062rem]"> { block?.number } </p>
                         <div className="rounded-md bg-gray-200 hover:opacity-80" onClick={() => onClick("PREV")}>
                             <i className="fa-solid fa-chevron-left fa-xs p-2"></i>
                         </div>
@@ -197,7 +206,7 @@ export default function Block() {
                         <p className="text-[0.9062rem] text-gray-500"> Parent Hash: </p>
                     </div>
                     <div className="flex">
-                        <p className="text-[0.9062rem]"> { block?.parentHash } </p>
+                        <Link to={`/block/${block?.parentHash}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.parentHash } </Link>
                     </div>
                 </div>
                 <div className="flex justify-between p-2">

@@ -349,20 +349,39 @@ export async function getBtcEthPrice() {
     }
 }
 
-export async function getRawBlockByNumber(blockNumber) {
+export async function getRawBlockByNumberOrHash(blockNumber, getBy) {
     try {
-        const res = await axios.post(
-            `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-            JSON.stringify({
-                jsonrpc: "2.0",
-                method: "eth_getBlockByNumber",
-                params: [toHex(blockNumber), false],
-                id: 0
-            }),
-            {
-                headers: { "Content-Type": "application/json" },
-            }
-        );
+        if (getBy !== "number" && getBy !== "hash") return;
+
+        let res = null;
+
+        if (getBy === "number") {
+            res = await axios.post(
+                `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+                JSON.stringify({
+                    jsonrpc: "2.0",
+                    method: "eth_getBlockByNumber",
+                    params: [toHex(blockNumber), false],
+                    id: 0
+                }),
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+        } else {
+            res = await axios.post(
+                `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+                JSON.stringify({
+                    jsonrpc: "2.0",
+                    method: "eth_getBlockByHash",
+                    params: [blockNumber, false],
+                    id: 0,
+                }),
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            )
+        }
 
         const data = res.data;
 
@@ -379,6 +398,30 @@ export async function getRawBlockByNumber(blockNumber) {
         }
 
         return {...data, result: { ...data.result, miner: ens }};
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export async function getRawTx(txHash) {
+    try {
+        const res = await axios.post(
+            `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+            JSON.stringify({
+                jsonrpc: "2.0",
+                method: "eth_getTransactionByHash",
+                params: [txHash],
+                id: 1,
+            }),
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+
+        console.log("=====")
+        console.log(res.data)
+        console.log("=====")
     } catch (e) {
         console.error(e);
         return null;

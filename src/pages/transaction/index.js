@@ -2,7 +2,7 @@ import { Utils } from "alchemy-sdk";
 import { useEffect, useState } from "react";
 import { Buffer } from "buffer";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getCurrentEtherPrice, getTx } from "../../services/ethereum";
+import { getCurrentEtherPrice, getRawTx, getTx } from "../../services/ethereum";
 
 export default function Transaction() {
     const [tx, setTx] = useState();
@@ -14,6 +14,7 @@ export default function Transaction() {
     useEffect(() => {
         (async () => {
             const txData = await getTx(txHash);
+            await getRawTx(txHash);
             if (!txData) return;
 
             const etherPrice = await getCurrentEtherPrice();
@@ -33,11 +34,9 @@ export default function Transaction() {
                     eth: etherPriceBase,
                     usd: etherPriceUSD,
                 },
-                maxFeePerGas: Utils.formatUnits(txData.maxFeePerGas, "gwei"),
-                maxPriorityFeePerGas: Utils.formatUnits(txData.maxPriorityFeePerGas, "gwei"),
+                maxFeePerGas: txData.maxFeePerGas ? Utils.formatUnits(txData.maxFeePerGas, "gwei") : null,
+                maxPriorityFeePerGas: txData.maxPriorityFeePerGas ? Utils.formatUnits(txData.maxPriorityFeePerGas, "gwei") : null,
             }
-
-            // console.log(Buffer.from(Utils.toUtf8Bytes(tx.data.slice(2,))).toString("utf-8"))
 
             setTx(tx_);
         })();
@@ -96,7 +95,7 @@ export default function Transaction() {
                     <p className="text-[0.9062rem]"> Value: </p>
                     <div className="">
                         <i class="fa-brands fa-ethereum fa-xs mx-2 text-slate-600"></i>
-                        <p className="inline text-[0.75rem]">  { tx?.value?.eth } <span className="bg-gray-100 p-1 border border-gray-200 rounded-lg text-black font-semibold"> $ { tx?.value?.usd } </span> </p>
+                        <p className="inline text-[0.75rem]">  { tx?.value?.eth } ETH <span className="bg-gray-100 p-1 border border-gray-200 rounded-lg text-black font-semibold ml-1"> $ { tx?.value?.usd?.toFixed(2) } </span> </p>
                     </div>
                 </div>
                 <div className="flex items-center justify-between p-1">
@@ -113,9 +112,9 @@ export default function Transaction() {
                     <div className="flex gap-3 items-center">
                         <p className="text-[0.9062rem] text-gray-500"> Base: <span className="text-black"> { tx?.gasPrice?.gwei } Gwei </span> </p>
                         |
-                        <p className="text-[0.9062rem] text-gray-500"> Max: <span className="text-black"> { tx?.maxFeePerGas } Gwei </span> </p>
+                        <p className="text-[0.9062rem] text-gray-500"> Max: <span className="text-black"> { typeof tx?.maxFeePerGas === "string" ? `${tx.maxFeePerGas} Gwei` : "None" } </span> </p>
                         |
-                        <p className="text-[0.9062rem] text-gray-500"> Max Priority: <span className="text-black"> { tx?.maxPriorityFeePerGas } Gwei </span> </p>
+                        <p className="text-[0.9062rem] text-gray-500"> Max Priority: <span className="text-black"> { typeof tx?.maxPriorityFeePerGas === "string" ? `${tx.maxPriorityFeePerGas} Gwei` : "None" } </span> </p>
                     </div>
                 </div>
                 <div className="flex items-center justify-between p-1">
