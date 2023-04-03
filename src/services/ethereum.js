@@ -118,7 +118,7 @@ export async function getBlocksWithData(amount, beforeBlockNumber) {
         const blocks = await Promise.all(blockNumbers.map((blockN) => alchemy.core.getBlockWithTransactions(blockN)));
 
         // Get the miner's data
-        const blocksWithMiners = await Promise.all(blocks.map(async (block) => {
+        const blocksWithMiners = await Promise.all(blocks?.map(async (block) => {
             try {
                 const minerENS = await alchemy.core.lookupAddress(block.miner);
                 return { ...block, miner: minerENS || block.miner, value: 0.99 }
@@ -169,46 +169,54 @@ export async function getTxList(amount, page) {
        let blockTxs = block[0].transactions;
 
        if (blockTxs.length < amount) {
-        // When the block txs are less than the amount keep asking for blocks
-        while (blockTxs.length < amount) {
-                const previousBlock = await getBlocksWithData(1, block[0].number); 
+            // When the block txs are less than the amount keep asking for blocks
+            while (blockTxs.length < amount) {
+                    const previousBlock = await getBlocksWithData(1, block[0].number); 
 
-                if (!previousBlock?.length) break;
+                    if (!previousBlock?.length) break;
 
-                const prevBlockTxs = previousBlock[0].transactions;
+                    const prevBlockTxs = previousBlock[0].transactions;
 
-                // When the previous block length + the current tx length is greater
-                // than the amount
-                if (blockTxs.length + prevBlockTxs.length > amount) {
-                    const missingBlocks = prevBlockTxs.slice(0, prevBlockTxs.length - blockTxs.length);
-                    blockTxs = [...blockTxs, ...missingBlocks];
-                } else {
-                    // Append the previous block txs
-                    blockTxs = [...blockTxs, ...prevBlockTxs];
-                }
-            } 
-
-            // Get the sender and receiver tx ENS address
-            blockTxs = await Promise.all(blockTxs.map(async (tx) => {
-                let ensFrom = tx.from;
-                let ensTo = tx.to;
-
-                try {
-                    ensFrom = await alchemy.core.lookupAddress(tx.from);
-                } catch (e) {}
-
-                try {
-                    ensTo = await alchemy.core.lookupAddress(tx.to);
-                } catch (e) {}
-
-                return { ...tx, from: ensFrom, to: ensTo };
-            }));
-
-            return blockTxs;
+                    // When the previous block length + the current tx length is greater
+                    // than the amount
+                    if (blockTxs.length + prevBlockTxs.length > amount) {
+                        const missingBlocks = prevBlockTxs.slice(0, prevBlockTxs.length - blockTxs.length);
+                        blockTxs = [...blockTxs, ...missingBlocks];
+                    } else {
+                        // Append the previous block txs
+                        blockTxs = [...blockTxs, ...prevBlockTxs];
+                    }
+            }
         }
 
+        // Get the sender and receiver tx ENS address
+        blockTxs = await Promise.all(blockTxs?.map(async (tx) => {
+            let ensFrom = tx.from;
+            let ensTo = tx.to;
+
+            try {
+                ensFrom = await alchemy.core.lookupAddress(tx.from);
+                if (!ensFrom?.length) {
+                    ensFrom = tx.from;
+                }
+            } catch (e) {
+                ensFrom = tx.from;
+            }
+
+            try {
+                ensTo = await alchemy.core.lookupAddress(tx.to);
+                if (!ensTo?.length) {
+                    ensTo = tx.to;
+                }
+            } catch (e) {
+                ensTo = tx.to;
+            }
+
+            return { ...tx, from: ensFrom, to: ensTo, timestamp: block[0].timestamp };
+        }));
+
         // When the block txs are more than the amount of txs
-        return blockTxs.slice(0, amount);
+        return blockTxs?.slice(0, amount);
 
     } catch (e) {
         console.error(e);
@@ -384,6 +392,8 @@ export async function getRawBlockByNumberOrHash(blockNumber, getBy) {
         }
 
         const data = res.data;
+
+        if (!data?.result) return null;
 
         let ens = "";
 

@@ -2,8 +2,11 @@ import {  Utils } from "alchemy-sdk";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getLastSafeBlock, getRawBlockByNumberOrHash } from "../../services/ethereum";
+import { copy2clipboard } from "../../utils/clipboard";
 import { getTimeDifference, getTimeUTCFormatted } from "../../utils/time";
 
+// TODO: Obtener el formato de la 'timestamp' adecuadamente
+// TODO: Logica del cambiar de bloque mediante los botones
 export default function Block() {
     const [block, setBlock] = useState();
     const [lastBlock, setLastBlock] = useState();
@@ -13,7 +16,7 @@ export default function Block() {
     const navigate = useNavigate();
 
     function onClick(direction) {
-        setBlock(null);
+        if (!block) return;
         if (direction === "PREV") {
             if (block.number >= 0) {
                 navigate(`/block/${block.number - 1}`);
@@ -69,7 +72,9 @@ export default function Block() {
 
             block_._difficulty = Utils.formatUnits(block_.totalDifficulty, "wei");
 
-            block_.size = Utils.formatUnits(block_.size, "wei")
+            block_.size = Utils.formatUnits(block_.size, "wei");
+
+            block_.number = Utils.formatUnits(block_.number, "wei");
 
             if (block_.extraData) {
                 const decodedExtraData = Utils.toUtf8String(block_.extraData);
@@ -90,7 +95,7 @@ export default function Block() {
             <div className="flex flex-col bg-white p-3 border border-slate-200 rounded-md my-10">
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Block Height: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Block Height: </p>
                     </div>
                     <div className="flex gap-1">
                         <p className="text-[0.9062rem]"> { block?.number } </p>
@@ -104,7 +109,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Status: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Status: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> Finalized </p>
@@ -112,7 +117,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Timestamp: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Timestamp: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.timestamp } </p>
@@ -120,7 +125,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Transactions: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Transactions: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> {block?.transactions?.length || 0 } transactions</p>
@@ -129,15 +134,16 @@ export default function Block() {
                 <hr className="bg-[#e9ecef] w-full" />
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Fee Recipient: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Fee Recipient: </p>
                     </div>
-                    <div className="flex">
-                        <p className="text-[0.9062rem]"> { block?.miner } </p>
+                    <div className="flex items-center">
+                        <Link to={`/block/${block?.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
+                        <i className="fa-regular fa-clone fa-xs ml-3" onClick={() => copy2clipboard(block?.miner)}></i>
                     </div>
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Block Reward: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Block Reward: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> ... </p>
@@ -145,7 +151,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Total Difficulty: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Total Difficulty: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?._difficulty } </p>
@@ -153,7 +159,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Size: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Size: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.size } bytes </p>
@@ -162,7 +168,7 @@ export default function Block() {
                 <hr className="bg-[#e9ecef] w-full" />
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Gas Used: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Gas Used: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.gasUsed } </p>
@@ -170,7 +176,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Gas Limit: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Gas Limit: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.gasLimit } </p>
@@ -178,7 +184,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Base Fee Per Gas: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Base Fee Per Gas: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.baseFeePerGas } </p>
@@ -186,7 +192,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Extra Data: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Extra Data: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.extraData } </p>
@@ -195,7 +201,7 @@ export default function Block() {
                 <hr className="bg-[#e9ecef] w-full" />
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Hash: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Hash: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.hash } </p>
@@ -203,7 +209,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Parent Hash: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Parent Hash: </p>
                     </div>
                     <div className="flex">
                         <Link to={`/block/${block?.parentHash}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.parentHash } </Link>
@@ -211,7 +217,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> StateRoot: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> StateRoot: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.hash } </p>
@@ -219,7 +225,7 @@ export default function Block() {
                 </div>
                 <div className="flex justify-between p-2">
                     <div className="flex">
-                        <p className="text-[0.9062rem] text-gray-500"> Nonce: </p>
+                        <p className="text-[0.9062rem] text-[#6d757d]"> Nonce: </p>
                     </div>
                     <div className="flex">
                         <p className="text-[0.9062rem]"> { block?.nonce } </p>

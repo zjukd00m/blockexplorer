@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import UserTokens from "../../components/UserTokens";
 import { getAddressData } from "../../services/ethereum";
+import { copy2clipboard } from "../../utils/clipboard";
 
 export default function Address() {
     const [ethBalance, setEthBalance] = useState(0);
@@ -38,7 +39,7 @@ export default function Address() {
         <div className="">
             <div className="">
                 <p className="inline text-md"> Address <span className="text-sm ml-3"> { userAddress } </span> </p>
-                <i className="fa-regular fa-clone fa-xs ml-2 text-slate-500"></i>
+                <i className="fa-regular fa-clone fa-xs ml-2 text-slate-500" onClick={() => copy2clipboard(userAddress)}></i>
             </div>
             <hr className="bg-[#e9ecef] w-full my-5" />
             <div className="">

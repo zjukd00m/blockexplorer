@@ -5,7 +5,9 @@ import { Link } from "react-router-dom";
 import { getTxList } from "../../services/ethereum";
 import { getTimeDifferenceInSeconds } from "../../utils/time";
 import { Utils } from "alchemy-sdk";
+import { copy2clipboard } from "../../utils/clipboard";
 
+// TODO: Find out how to get the TX 'method'
 export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const [page, setPage] = useState(1);
@@ -34,11 +36,21 @@ export default function Transactions() {
         }),
         columnHelper.accessor("from", {
             header: () => <span> From </span>,
-            cell: (info) => <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>,
+            cell: (info) => (
+                <div className="flex items-center">
+                    <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>
+                    <i class="fa-regular fa-clone fa-xs ml-3" onClick={() => copy2clipboard(info.getValue())}></i>
+                </div>
+            )
         }),
         columnHelper.accessor("to", {
             header: () => <span> To </span>,
-            cell: (info) => <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>,
+            cell: (info) => (
+                <div className="flex items-center">
+                    <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>
+                    <i class="fa-regular fa-clone fa-xs ml-3" onClick={() => copy2clipboard(info.getValue())}></i>
+                </div>
+            ) 
         }),
         columnHelper.accessor("value", {
             header: () => <span> Value </span>,
@@ -52,8 +64,8 @@ export default function Transactions() {
 
     // Fetch transactions from the service
     useEffect(() => {
-        // setLoading(true);
-        // setError(false);
+        setLoading(true);
+        setError(false);
        (async () => {
             const txs = await getTxList(rows);
 
@@ -64,9 +76,7 @@ export default function Transactions() {
             }
 
             const parsedTxs = txs.map((tx) => {
-                const { timestamp, value } = tx;
-
-                const age = getTimeDifferenceInSeconds(new Date(timestamp), new Date());
+                const { value } = tx;
 
                 const value_ = Utils.formatUnits(value, "ether");
 
@@ -74,11 +84,11 @@ export default function Transactions() {
                     hash: tx.hash,
                     method: "NOP",
                     block: tx.blockNumber,
-                    age,
                     from: tx.from,
                     to: tx.to,
                     value: Number(value_).toFixed(7),
-                    txnFee: "0.001",
+                    age: getTimeDifferenceInSeconds(new Date(tx.timestamp), new Date()),
+                    ...(tx.maxFeePerGas && { txnFee: Utils.formatUnits(tx.maxFeePerGas, "gwei") }),
                 }
             });
 

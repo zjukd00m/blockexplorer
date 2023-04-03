@@ -3,16 +3,17 @@ import { createColumnHelper } from "@tanstack/react-table";
 import Table from "../../components/Table";
 import { getBlocksWithData } from "../../services/ethereum";
 import { getTimeDifferenceInSeconds } from "../../utils/time";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { Utils } from "alchemy-sdk";
 
 
-
+// TODO: Get 'rewards' and 'burn fees'
 export default function Blocks() {
     const [blocks, setBlocks] = useState([]);
     const [page, setPage] = useState(1);
     const [rows, setRows] = useState(25);
     const [lastBlock, setLastBlock] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
 
     const columnHelper = createColumnHelper();
@@ -52,7 +53,7 @@ export default function Blocks() {
     ];
 
     useEffect(() => {
-        // setLoading(true);
+        setLoading(true);
         setError(false);
         (async () => {
             let parsedBlocks = [];
@@ -68,9 +69,9 @@ export default function Blocks() {
             parsedBlocks = blocks_?.map((block_) => {
                 const age = getTimeDifferenceInSeconds(new Date(block_.timestamp), new Date());
                 const transactions = block_.transactions.length;
-                const gasUsed = 1;
-                const gasLimit = "30,000,000";
-                const baseFee = "44.88 Gwei";
+                const gasUsed = Utils.formatUnits(block_.gasUsed, "wei");
+                const gasLimit = Utils.formatUnits(block_.gasUsed, "wei");
+                const baseFee = Number(Utils.formatUnits(block_.baseFeePerGas, "gwei")).toFixed(2);
                 const reward = "0.01 ETH";
                 const burntFees = "0.486668";
                 
@@ -90,7 +91,7 @@ export default function Blocks() {
             setBlocks(parsedBlocks);
             setLastBlock(parsedBlocks[parsedBlocks.length - 1]);
 
-            // setLoading(false);
+            setLoading(false);
         })();
     }, [page, rows]);
 
@@ -107,14 +108,8 @@ export default function Blocks() {
                     page={page} 
                     totalPages={100} 
                     loading={loading}
-                    onPageChange={(nPage) => {
-                        console.log(nPage);
-                        setPage(nPage);
-                    }}
-                    onRowSelect={(nRows) => {
-                        console.log(nRows);
-                        setRows(nRows);
-                    }}
+                    onPageChange={(nPage) => setPage(nPage)}
+                    onRowSelect={(nRows) => setRows(nRows)}
                 />
             }
         </div>

@@ -1,6 +1,7 @@
 import { Utils } from "alchemy-sdk";
 import { useState, useEffect } from "react";
 import { getTokenMetaData } from "../../services/ethereum";
+import { copy2clipboard } from "../../utils/clipboard";
 
 export default function UserTokens({ tokens }) {
     const [selectedToken, setSelectedToken] = useState();
@@ -45,7 +46,7 @@ export default function UserTokens({ tokens }) {
                                         </div>
                                         <div>
                                             <p className="text-xs inline mr-2"> {token.contractAddress} </p>
-                                            <i className="fa-regular fa-clone fa-xs text-slate-500"></i>
+                                            <i className="fa-regular fa-clone fa-xs text-slate-500" onClick={() => copy2clipboard(token.contractAddress)}></i>
                                         </div>
                                     </div>
                                     <div className="flex justify-start mt-2">
