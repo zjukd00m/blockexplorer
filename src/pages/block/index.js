@@ -138,7 +138,7 @@ export default function Block() {
                     </div>
                     <div className="flex items-center">
                         <Link to={`/block/${block?.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
-                        <i className="fa-regular fa-clone fa-xs ml-3" onClick={() => copy2clipboard(block?.miner)}></i>
+                        <i className="fa-regular fa-clone fa-xs ml-3 text-slate-600" onClick={() => copy2clipboard(block?.miner)}></i>
                     </div>
                 </div>
                 <div className="flex justify-between p-2">

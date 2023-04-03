@@ -212,7 +212,13 @@ export async function getTxList(amount, page) {
                 ensTo = tx.to;
             }
 
-            return { ...tx, from: ensFrom, to: ensTo, timestamp: block[0].timestamp };
+            let txReceipt = null;
+
+            try {
+                txReceipt = await alchemy.core.getTransactionReceipt(tx.hash);
+            } catch (e) {}
+
+            return { ...tx, from: ensFrom, to: ensTo, timestamp: block[0].timestamp, receipt: txReceipt };
         }));
 
         // When the block txs are more than the amount of txs
@@ -250,12 +256,12 @@ export async function getBlock(blockNumber) {
 export async function getTx(txHash) {
     try {
         const tx = await alchemy.core.getTransaction(txHash);
+
+        const txReceipt = await alchemy.core.getTransactionReceipt(tx.hash);
         
         if (!tx) return null;
 
-        console.log(tx)
-
-        return tx;
+        return { ...tx, receipt: txReceipt };
     } catch (e) {
         console.error(e);
         return null;

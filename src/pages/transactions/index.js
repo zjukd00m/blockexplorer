@@ -39,7 +39,7 @@ export default function Transactions() {
             cell: (info) => (
                 <div className="flex items-center">
                     <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>
-                    <i class="fa-regular fa-clone fa-xs ml-3" onClick={() => copy2clipboard(info.getValue())}></i>
+                    <i className="fa-regular fa-clone fa-xs ml-3 text-slate-600" onClick={() => copy2clipboard(info.getValue())}></i>
                 </div>
             )
         }),
@@ -48,7 +48,7 @@ export default function Transactions() {
             cell: (info) => (
                 <div className="flex items-center">
                     <Link to={`/address/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>
-                    <i class="fa-regular fa-clone fa-xs ml-3" onClick={() => copy2clipboard(info.getValue())}></i>
+                    <i className="fa-regular fa-clone fa-xs ml-3 text-slate-600" onClick={() => copy2clipboard(info.getValue())}></i>
                 </div>
             ) 
         }),
@@ -68,6 +68,8 @@ export default function Transactions() {
         setError(false);
        (async () => {
             const txs = await getTxList(rows);
+
+            console.log(txs[0])
 
             if (!txs?.length) {
                 setLoading(false);
