@@ -1,8 +1,9 @@
-import { toHex, Utils  } from "alchemy-sdk";
+import { toHex, Utils } from "alchemy-sdk";
 import axios from "axios";
 import alchemy from "../utils/alchemyClient";
 
 const ALCHEMY_API_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
+
 
 export async function searchEthereum(searchQ, searchBy) {
     let res = null;
@@ -100,7 +101,6 @@ export async function getBlockTransactionsCost(blockData) {
         .reduce((acc, txValue) => acc + txValue, 0);
 }
 
-// TODO: Find out how to get the block reward
 export async function getBlocksWithData(amount, beforeBlockNumber) {
     try {
         let lastBlock;
@@ -258,7 +258,7 @@ export async function getTx(txHash) {
         const tx = await alchemy.core.getTransaction(txHash);
 
         const txReceipt = await alchemy.core.getTransactionReceipt(tx.hash);
-        
+
         if (!tx) return null;
 
         return { ...tx, receipt: txReceipt };
@@ -413,7 +413,9 @@ export async function getRawBlockByNumberOrHash(blockNumber, getBy) {
             ens = data.result.miner;
         }
 
-        return {...data, result: { ...data.result, miner: ens }};
+        const timestamp = parseInt(data.result.timestamp) * 1000;
+
+        return {...data, result: { ...data.result, miner: ens, timestamp }};
     } catch (e) {
         console.error(e);
         return null;

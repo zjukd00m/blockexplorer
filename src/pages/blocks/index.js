@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import Table from "../../components/Table";
 import { getBlocksWithData } from "../../services/ethereum";
-import { getTimeDifferenceInSeconds } from "../../utils/time";
+import { getTimeDifference } from "../../utils/time";
 import { Link } from "react-router-dom";
 import { Utils } from "alchemy-sdk";
 
 
-// TODO: Get 'rewards' and 'burn fees'
 export default function Blocks() {
     const [blocks, setBlocks] = useState([]);
     const [page, setPage] = useState(1);
@@ -25,7 +24,7 @@ export default function Blocks() {
         }),
         columnHelper.accessor("age", {
             header: () => <span> Age </span>,
-            cell: (info) => <span> { `${info.getValue()} secs ago` } </span>
+            cell: (info) => <span className="truncate"> { `${info.getValue()} secs ago` } </span>
         }),
         columnHelper.accessor("transactions", {
             header: () => <span> Txn </span>
@@ -44,12 +43,12 @@ export default function Blocks() {
         columnHelper.accessor("baseFee", {
             header: () => <span> Base Fee </span>
         }),
-        columnHelper.accessor("reward", {
-            header: () => <span> Reward </span>
-        }),
-        columnHelper.accessor("burntFees", {
-            header: () => <span> Burn Fees (ETH) </span>
-        }),
+        // columnHelper.accessor("reward", {
+        //     header: () => <span> Reward </span>
+        // }),
+        // columnHelper.accessor("burntFees", {
+        //     header: () => <span> Burn Fees (ETH) </span>
+        // }),
     ];
 
     useEffect(() => {
@@ -67,13 +66,11 @@ export default function Blocks() {
             }
 
             parsedBlocks = blocks_?.map((block_) => {
-                const age = getTimeDifferenceInSeconds(new Date(block_.timestamp), new Date());
+                const age = getTimeDifference(new Date(block_.timestamp * 1000), new Date());
                 const transactions = block_.transactions.length;
                 const gasUsed = Utils.formatUnits(block_.gasUsed, "wei");
                 const gasLimit = Utils.formatUnits(block_.gasUsed, "wei");
                 const baseFee = Number(Utils.formatUnits(block_.baseFeePerGas, "gwei")).toFixed(2);
-                const reward = "0.01 ETH";
-                const burntFees = "0.486668";
                 
                 return {
                     number: block_.number,
@@ -83,8 +80,6 @@ export default function Blocks() {
                     gasUsed,
                     gasLimit,
                     baseFee,
-                    reward,
-                    burntFees,
                 }
             });
 

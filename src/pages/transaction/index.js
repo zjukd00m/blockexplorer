@@ -9,7 +9,7 @@ import { copy2clipboard } from "../../utils/clipboard";
 export default function Transaction() {
     const [tx, setTx] = useState();
     const { txHash } = useParams();
-    const [txDataFormat, setTxDataFormat] = useState("DEFAULT");
+    const [txDataFormat, setTxDataFormat] = useState("ORIGINAL");
     const [txData, setTxData] = useState("");
     const [rawTxData, setRawTxData] = useState("");
 
@@ -25,16 +25,11 @@ export default function Transaction() {
             const hexData = rawTxData?.slice(2);
             if (!hexData) return;
             txDataFormatted = Buffer.from(hexData, "hex").toString();
-        } else { // DEFAULT
-           // TODO: How to decode the raw data in such a way to visualize the contract function call (if it's an interaction with a contract) 
+        } else {
+            return;
         }
         setTxData(txDataFormatted);
-
-        return () => {
-            // setTxData(null);
-            // setRawTxData(null);
-            // setTxDataFormat(null);
-        }
+    
     }, [txDataFormat, rawTxData]);
 
 
@@ -46,12 +41,6 @@ export default function Transaction() {
             const etherPrice = await getCurrentEtherPrice();
 
             if (!etherPrice) return;
-
-            console.log(txData.data)
-
-            console.log(Utils.hexValue(txData.data))
-
-            // const hexData = txData.data.slice(2);
 
             const etherPriceBase = Utils.formatUnits(txData.value, "ether");
             const etherPriceUSD = etherPrice.ethPriceUSD * etherPriceBase;
@@ -175,7 +164,6 @@ export default function Transaction() {
                         >
                         </textarea>
                         <select className="w-fit p-1 my-3 text-sm rounded-md text-slate-600" onChange={(e) => setTxDataFormat(e.target.value)}>
-                            <option className="text-sm" value={"DEFAULT"}> Default View </option>
                             <option className="text-sm" value={"UTF8"}> UTF-8 </option>
                             <option className="text-sm" value={"ORIGINAL"}> Original </option>
                         </select>

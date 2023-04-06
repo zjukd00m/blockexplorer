@@ -14,7 +14,7 @@ export const NumberToMonth = {
 }
 
 export function getTimeDifferenceInSeconds(start, end) {
-    const diff = end.getTime() - start.getTime();
+    const diff = Math.abs(end.getTime() - start.getTime());
 
     return Math.floor((diff / 1000 ) % 60);
 }
@@ -22,32 +22,30 @@ export function getTimeDifferenceInSeconds(start, end) {
 export function getTimeDifference(start, end) {
     const diff = Math.abs(end.getTime() - start.getTime());
     
-    const days = (diff/(1000 * 60 * 60 * 24))
+    const days = Math.floor(diff/(1000 * 60 * 60 * 24));
 
-    const hours = (((diff/(1000 * 60 * 60)))) % 24
+    const hours = Math.floor(((diff % (1000 * 60 * 60 * 24))) / (1000 * 60 * 60)); 
 
-    const minutes = ((diff/(1000 * 60))) % 60
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-    const seconds = ((diff/(1000))) % 60
-    
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
     let format = "";
 
-    if (days <= 0) {
-        format = "HM";
-    } else {
+    if (days > 0.0) {
         format = "D";
     }
 
-    if (hours <= 0) {
-        format = "MS";
-    } else {
+    if (hours > 0.0) {
         format += "H";
     }
 
-    if (minutes <= 0) {
-        format = "S";
-    } else {
-        format += "MS";
+    if (minutes > 0.0) {
+        format += "M";
+    }
+
+    if (seconds > 0.0) {
+        format += "S";
     }
 
     if (format === "DHMS") {

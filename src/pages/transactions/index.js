@@ -32,7 +32,7 @@ export default function Transactions() {
         }),
         columnHelper.accessor("age", {
             header: () => <span> Age </span>,
-            cell: (info) => <span className="block"> { `${info.getValue()} secs ago` } </span>
+            cell: (info) => <span className="block truncate"> { `${info.getValue()} secs ago` } </span>
         }),
         columnHelper.accessor("from", {
             header: () => <span> From </span>,

@@ -6,7 +6,6 @@ import { copy2clipboard } from "../../utils/clipboard";
 import { getTimeDifference, getTimeUTCFormatted } from "../../utils/time";
 
 // TODO: Obtener el formato de la 'timestamp' adecuadamente
-// TODO: Logica del cambiar de bloque mediante los botones
 export default function Block() {
     const [block, setBlock] = useState();
     const [lastBlock, setLastBlock] = useState();
@@ -18,13 +17,13 @@ export default function Block() {
     function onClick(direction) {
         if (!block) return;
         if (direction === "PREV") {
-            if (block.number >= 0) {
-                navigate(`/block/${block.number - 1}`);
+            if (+block.number >= 0) {
+                navigate(`/block/${+block.number - 1}`);
             }
             return;
-        } else {
-            if (block.number < lastBlock) {
-                navigate(`/block/${block.number + 1}`);
+        } else if (direction === "NEXT") {
+            if (+block.number < lastBlock) {
+                navigate(`/block/${+block.number + 1}`);
             }
             return;
         }
@@ -39,7 +38,11 @@ export default function Block() {
 
             setLastBlock(lastBlockNumber);
         })();
-    }, []);
+
+        return () => {
+            // setLastBlock(null);
+        }
+    }, [block]);
     
     // Get the block by number or by hash
     useEffect(() => {
@@ -51,7 +54,6 @@ export default function Block() {
         else if (blockNumber.startsWith("0x")) getBy = "hash";
 
         (async () => {
-
             const result = await getRawBlockByNumberOrHash(blockNumber, getBy);
 
             if (!result) return;
@@ -64,11 +66,9 @@ export default function Block() {
 
             block_.gasUsed = Utils.formatUnits(block_.gasUsed, "wei");
 
-            block_.timestamp = Number(Utils.formatUnits(block_.timestamp, "wei"));
-
             const utcStringTimestamp = getTimeUTCFormatted(block_.timestamp);
 
-            block_.timestamp = `${getTimeDifference(new Date(Date(block_.timestamp)), new Date())} (${utcStringTimestamp})`;
+            block_.timestamp = `${getTimeDifference(new Date(block_.timestamp), new Date())} (${utcStringTimestamp})`;
 
             block_._difficulty = Utils.formatUnits(block_.totalDifficulty, "wei");
 
@@ -76,13 +76,26 @@ export default function Block() {
 
             block_.number = Utils.formatUnits(block_.number, "wei");
 
+
             if (block_.extraData) {
-                const decodedExtraData = Utils.toUtf8String(block_.extraData);
-                block_.extraData = decodedExtraData + ` (Hex: ${block_.extraData})`;
+                let decodedExtraData = "";
+
+                try {
+                    decodedExtraData = Utils.toUtf8String(block_.extraData);
+                } 
+                catch (e) {} 
+                finally {
+                    block_.extraData = decodedExtraData ? decodedExtraData + ` (Hex: ${block_.extraData})` : `(Hex: ${block_.extraData}`;
+                }
             }
 
             setBlock(block_);
+
         })();
+
+        return () => {
+            // setBlock(null);
+        }
     }, [blockNumber]);
 
     return (
@@ -139,14 +152,6 @@ export default function Block() {
                     <div className="flex items-center">
                         <Link to={`/block/${block?.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
                         <i className="fa-regular fa-clone fa-xs ml-3 text-slate-600" onClick={() => copy2clipboard(block?.miner)}></i>
-                    </div>
-                </div>
-                <div className="flex justify-between p-2">
-                    <div className="flex">
-                        <p className="text-[0.9062rem] text-[#6d757d]"> Block Reward: </p>
-                    </div>
-                    <div className="flex">
-                        <p className="text-[0.9062rem]"> ... </p>
                     </div>
                 </div>
                 <div className="flex justify-between p-2">
