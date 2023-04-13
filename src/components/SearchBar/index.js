@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { searchEthereum } from "../../services/ethereum";
+import { useNavigate } from "react-router-dom";
 
 function SearchFiltersDropdown({ styles }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -24,8 +25,8 @@ function SearchFiltersDropdown({ styles }) {
                 isOpen ? (
                     <div className="top-[2rem] z-10 border border-gray-600 absolute bg-white w-full">
                         {
-                            searchFilters.map((filter_) => (
-                                <p className="text-[0.75rem] hover:bg-blue-400 hover:text-white p-1" onClick={() => {
+                            searchFilters.map((filter_, key) => (
+                                <p key={key} className="text-[0.75rem] hover:bg-blue-400 hover:text-white p-1" onClick={() => {
                                     setFilter(filter_);
                                     setIsOpen(false);
                                 }}> { filter_ } </p>
@@ -39,31 +40,25 @@ function SearchFiltersDropdown({ styles }) {
 }
 
 export default function SearchBar(props) {
-    const { autocomplete, leftInputItem, rightInputItem, placeholder } = props;
+    const { leftInputItem, rightInputItem, placeholder } = props;
     const [searchQ, setSearchQ] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
-    const [searchItem, setSearchItem] = useState(null);
+    const [searchItem, setSearchItem] = useState([]);
+    
+    const navigate = useNavigate();
 
     // Search in the API as the search query changes if autocomplete is on
     useEffect(() => {
-        if (!searchQ?.length) return;
-
         (async () => {
             await onSubmit(searchQ);
         })();
     }, [searchQ]);
 
-    // When an option in the autocomplete list is selected
-    async function onSelect(itemHash) {
-        console.log("This shit was selected: ", itemHash);
-    }
-
-    console.log("The search item")
-    console.log(searchItem)
-
     // When the search term is submited
     async function onSubmit() {
-        if (!searchQ?.length) return;
+        if (!searchQ?.length) {
+            setSearchItem([]);
+            return;
+        }
 
         let res = null;
 
@@ -71,7 +66,7 @@ export default function SearchBar(props) {
         res = await searchEthereum(searchQ, "BLOCK"); 
 
         if (res) {
-            setSearchItem(res);
+            setSearchItem([{...res, type: "Block" }]);
             return;
         }
 
@@ -79,7 +74,7 @@ export default function SearchBar(props) {
         res = await searchEthereum(searchQ, "TX");
 
         if (res) {
-            setSearchItem(res);
+            setSearchItem([{...res, type: "Transaction" }]);
             return;
         }
 
@@ -87,7 +82,7 @@ export default function SearchBar(props) {
         res = await searchEthereum(searchQ, "TOKEN");
 
         if (res) {
-            setSearchItem(res);
+            setSearchItem([{...res, type: "Token" }]);
             return;
         }
 
@@ -95,15 +90,15 @@ export default function SearchBar(props) {
         res = await searchEthereum(searchQ, "DOMAIN_NAME");
 
         if (res) {
-            setSearchItem(res);
+            setSearchItem([{...res, type: "Domain Name"}]);
             return;
         }
 
-        setSearchItem(null);
+        setSearchItem([]);
     }
 
     return (
-        <div className="w-full bg-white rounded-md p-1">
+        <div className="w-full bg-white rounded-md p-1 relative">
             <div className="flex items-center gap-2">
                 {
                     leftInputItem ? (
@@ -123,12 +118,21 @@ export default function SearchBar(props) {
                     ) : null
                 }
             </div>
-            <div>
+            <div className={`absolute bg-gray-100 w-full p-2 left-0 border border-gray-400 ${searchItem?.length ? "" : "hidden"}`}>
                 {
-                    suggestions?.map((item) => {
+                    searchItem?.map((item, key) => {
                       return (
-                        <div>
-                            <p> { item.hash } </p>
+                        <div className="" key={key} onClick={() => {
+                            if (item.type === "Block") {
+                                navigate(`/block/${item.number}`);
+                            } else if (item.type === "Transaction") {
+                                navigate(`/tx/${item.hash}`);
+                            } else {
+                                alert("Not implemented :'(");
+                            }
+                        }}>
+                            <p className="font-xs"> Type: <span> { item.type } </span> </p>
+                            <p className="font-xs"> Address: <span> { item.hash } </span> </p>
                         </div>
                       )  
                     })

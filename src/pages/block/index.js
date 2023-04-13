@@ -5,7 +5,6 @@ import { getLastSafeBlock, getRawBlockByNumberOrHash } from "../../services/ethe
 import { copy2clipboard } from "../../utils/clipboard";
 import { getTimeDifference, getTimeUTCFormatted } from "../../utils/time";
 
-// TODO: Obtener el formato de la 'timestamp' adecuadamente
 export default function Block() {
     const [block, setBlock] = useState();
     const [lastBlock, setLastBlock] = useState();
@@ -60,8 +59,10 @@ export default function Block() {
 
             const block_ = result.result;
 
-            block_.baseFeePerGas = `${Utils.formatUnits(block_.baseFeePerGas, "ether")} ETH (${Utils.formatUnits(block_.baseFeePerGas, "gwei")} Gwei)`;
-            
+            if (block_.baseFeePerGas) {
+                block_.baseFeePerGas = `${Utils.formatUnits(block_.baseFeePerGas, "ether")} ETH (${Utils.formatUnits(block_.baseFeePerGas, "gwei")} Gwei)`;
+            }
+
             block_.gasLimit = Utils.formatUnits(block_.gasLimit, "wei");
 
             block_.gasUsed = Utils.formatUnits(block_.gasUsed, "wei");
@@ -150,7 +151,7 @@ export default function Block() {
                         <p className="text-[0.9062rem] text-[#6d757d]"> Fee Recipient: </p>
                     </div>
                     <div className="flex items-center">
-                        <Link to={`/block/${block?.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
+                        <Link to={`/address/${block.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
                         <i className="fa-regular fa-clone fa-xs ml-3 text-slate-600" onClick={() => copy2clipboard(block?.miner)}></i>
                     </div>
                 </div>

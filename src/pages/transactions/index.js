@@ -68,8 +68,7 @@ export default function Transactions() {
         setError(false);
        (async () => {
             const txs = await getTxList(rows);
-
-            console.log(txs[0])
+            // const txs = [];
 
             if (!txs?.length) {
                 setLoading(false);

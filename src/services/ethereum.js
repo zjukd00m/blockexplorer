@@ -120,16 +120,17 @@ export async function getBlocksWithData(amount, beforeBlockNumber) {
         // Get the miner's data
         const blocksWithMiners = await Promise.all(blocks?.map(async (block) => {
             try {
+                // TODO: How to remove the error from here ?
                 const minerENS = await alchemy.core.lookupAddress(block.miner);
                 return { ...block, miner: minerENS || block.miner, value: 0.99 }
             } catch (e) {
+                console.log("Errror")
                 return block;
             }
         }));
 
         return blocksWithMiners;
     } catch(e) {
-        console.error(e);
         return null;
     }
 }
@@ -168,6 +169,8 @@ export async function getTxList(amount, page) {
 
        let blockTxs = block[0].transactions;
 
+       console.log("I'm here")
+
        if (blockTxs.length < amount) {
             // When the block txs are less than the amount keep asking for blocks
             while (blockTxs.length < amount) {
@@ -189,10 +192,14 @@ export async function getTxList(amount, page) {
             }
         }
 
+        console.log("Now, I'm here...")
+
         // Get the sender and receiver tx ENS address
         blockTxs = await Promise.all(blockTxs?.map(async (tx) => {
             let ensFrom = tx.from;
             let ensTo = tx.to;
+
+            
 
             try {
                 ensFrom = await alchemy.core.lookupAddress(tx.from);
@@ -225,7 +232,6 @@ export async function getTxList(amount, page) {
         return blockTxs?.slice(0, amount);
 
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -248,7 +254,6 @@ export async function getBlock(blockNumber) {
 
         return {...block, miner: ens};
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -263,7 +268,6 @@ export async function getTx(txHash) {
 
         return { ...tx, receipt: txReceipt };
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -274,7 +278,6 @@ export async function getTokenMetaData(tokenAddress) {
 
         return tokenMetadata;
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -302,7 +305,6 @@ export async function getAddressData(address) {
             txCount,
         }
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -317,9 +319,6 @@ export async function getAddressData(address) {
 export async function getCurrentEtherPrice() {
     try {
         const res = await axios.get("https://api.coingecko.com/api/v3/coins/ethereum");
-
-        console.log(res.data)
-
         const { converted_last } = res.data.tickers.find(({ target }) => target === "USD" );
         
         const priceChange = res.data.market_data.price_change_percentage_24h;
@@ -329,7 +328,6 @@ export async function getCurrentEtherPrice() {
             ethPriceUSD: converted_last.usd
         };
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -345,7 +343,6 @@ export async function getMarketCap() {
 
         return ethMarketCap * converted_last.usd;
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -358,7 +355,6 @@ export async function getBtcEthPrice() {
 
         return btcEthPrice;
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -404,6 +400,7 @@ export async function getRawBlockByNumberOrHash(blockNumber, getBy) {
         let ens = "";
 
         try {
+
             ens = await alchemy.core.lookupAddress(data.result.miner);
 
             if (!ens) {
@@ -417,7 +414,6 @@ export async function getRawBlockByNumberOrHash(blockNumber, getBy) {
 
         return {...data, result: { ...data.result, miner: ens, timestamp }};
     } catch (e) {
-        console.error(e);
         return null;
     }
 }
@@ -436,12 +432,8 @@ export async function getRawTx(txHash) {
                 headers: { "Content-Type": "application/json" },
             }
         );
-
-        console.log("=====")
-        console.log(res.data)
-        console.log("=====")
+        return res.data;
     } catch (e) {
-        console.error(e);
         return null;
     }
 }

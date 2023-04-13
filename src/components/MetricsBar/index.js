@@ -16,8 +16,6 @@ export default function MetricsBar(props) {
 
             avgGasPrice = await getAvgGasPrice(true);
             setAvgGasPriceUSD(Math.floor(avgGasPrice));
-
-            console.log("Avg gas price in usd: ", avgGasPrice)
         })();
     }, []);
     

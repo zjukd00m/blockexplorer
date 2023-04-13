@@ -1,12 +1,14 @@
 import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 import navbarMenu from "./menu";
 import NavbarDropdown from "../NavbarDropdown";
 
 export default function Navbar() {
+    const navigate = useNavigate();
     return (
         <nav className="flex items-center justify-between py-4">
             <div className="flex-grow">
-                <img src="https://etherscan.io/assets/svg/logos/logo-etherscan.svg?v=0.0.5" height="34.5px" width="150px" alt="Etherscan Logo" />
+                <img src="https://etherscan.io/assets/svg/logos/logo-etherscan.svg?v=0.0.5" height="34.5px" width="150px" alt="Etherscan Logo" onClick={() => navigate("/")} />
             </div>
             
             <ul className="flex items-center gap-8 mr-8">
