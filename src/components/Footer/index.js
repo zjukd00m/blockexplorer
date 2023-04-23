@@ -1,3 +1,6 @@
+import "./styles.css";
+
+
 const socialUrls = [
     {  
         url: "https://twitter.com/",
@@ -110,9 +113,9 @@ export default function Footer() {
                 </div>
                 <hr className="bg-[#e9ecef] w-full" />
                 {/* Menu Footer */}
-                <div className="grid grid-cols-2 mt-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 mt-5">
                     {/* COL 1 */}
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 md:items-start items-center">
                         <div>
                             <i className="fa-brands fa-ethereum fa-2xl"></i>
                             <p className="inline text-md ml-1"> Powered by Ethereum </p>
@@ -122,7 +125,7 @@ export default function Footer() {
                         <img src="/assets/the-world.jpeg" alt="the-world" height="50px" width="280px" />
                     </div>
                     {/* COL 2 */}
-                    <div className="w-full flex justify-between">
+                    <div className="w-full flex justify-between mt-5 lg:mt-0">
                         <div className="flex flex-col">
                             <p className="font-semibold mb-1"> Company </p> 
                             {

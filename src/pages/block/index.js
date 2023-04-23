@@ -151,7 +151,7 @@ export default function Block() {
                         <p className="text-[0.9062rem] text-[#6d757d]"> Fee Recipient: </p>
                     </div>
                     <div className="flex items-center">
-                        <Link to={`/address/${block.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
+                        <Link to={`/address/${block?.miner}`} className="text-[0.9062rem] text-[#1e40af]"> { block?.miner } </Link>
                         <i className="fa-regular fa-clone fa-xs ml-3 text-slate-600" onClick={() => copy2clipboard(block?.miner)}></i>
                     </div>
                 </div>

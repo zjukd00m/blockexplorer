@@ -5,12 +5,19 @@ export default function NavbarDropdown({ name, items }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="flex flex-col" onMouseEnter={() => setIsExpanded(true)} onMouseLeave={() => setIsExpanded(false)}>
-            <div className="flex items-center gap-2">
-                <p className="text-[14.5px] hover:text-[#1e40af]"> { name } </p>
-                {
-                    items?.length ? <ChevronDownIcon height="15" width="15" /> : null
-                }
+        <div className="flex flex-col w-full" 
+            onMouseEnter={() => setIsExpanded(true)} 
+            onMouseLeave={() => setIsExpanded(false)} 
+            onClick={() => setIsExpanded(!isExpanded)}
+        >
+            <div className="flex items-center gap-2 w-full">
+                <p className="text-[14.5px]"> { name } </p>
+                <div className="flex w-full">
+                    <div className="flex-grow"></div>
+                    {
+                        items?.length ? <ChevronDownIcon height="15" width="15" /> : null
+                    }
+                </div>
             </div>
             <div className="relative">
                 {
