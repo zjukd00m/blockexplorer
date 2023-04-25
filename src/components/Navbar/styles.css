@@ -17,19 +17,18 @@
 
 .navbar_logo__container {
     display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+.navbar-user {
+    display: flex;
 }
 
 @media (max-width: 1024px) {
     .navbar_container {
         flex-direction: column; 
         align-items: normal;
-        /* justify-content: space-around; */
-    }
-
-    .navbar_logo__container {
-        /* flex-direction: column; */
-        /* align-items: center; */
-        /* justify-content: space-between; */
     }
 
     .hamburguer__menu {
@@ -41,37 +40,39 @@
     .nav_hamburguer__icon {
         display: flex;
         visibility: visible;
+        right: 0;
+        position: absolute;
+        border: 1px solid rgb(220, 224, 228);
+        border-radius: 5px;
     }
 
     .navbar__menu {
         display: flex;
-        background-color: slategray;
+        align-items: center;
+        left: 0;
+        right: 4rem;
+        margin-top: 1rem;
     }
 
-    .navbar__menu > ul {
-        /* position: absolute; */
+    .navbar__menu_list {
         display: flex;
         flex-direction: column;
         left: 0;
-        bottom: -22rem;
+        background-color: white;
+        width: 100%;
     }
 
     .navbar-user {
         position: absolute;
-        top: 0;
+        top: 1.5rem;
+        right: 3rem;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
     }
 
     .navbar-dropdown {
         width: 100%;
     }
 
-
-
 }
-
-
-/*
-Tomando caminos distinto que nunca dudare de caminar
-Porque venimos los negros no perdodamos hasta darles suelo
- 
-*/

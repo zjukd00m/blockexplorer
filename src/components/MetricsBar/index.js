@@ -53,7 +53,7 @@ export default function MetricsBar(props) {
     }, []);
 
     return (
-        <div className="grid grid-cols-3 rounded-md bg-slate-200 w-full p-5">
+        <div className="grid grid-cols-2 rounded-md bg-slate-200 w-full p-5">
             <div className="flex flex-col p-3 justify-between box-border bg-white">
                 <div className="">
                     <p className="uppercase text-[12px]"> Ether Price </p>
@@ -96,10 +96,6 @@ export default function MetricsBar(props) {
                         <p className="text-[15px]"> { avgGasPriceWGEI } </p>
                     </div>
                 </div>
-            </div>
-            <div className="p-3 text-[12px] bg-white">  
-                <p className="font-sm uppercase"> Transaction history in 14 days </p>
-                <p> Chart goes here ... </p>
             </div>
         </div>
     )

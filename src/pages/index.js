@@ -17,10 +17,10 @@ export default function Index() {
               </div>
           </div>
           <div>
-              <div className=" mt-[5rem]">
+              <div className="mt-[5rem]">
               <MetricsBar />
           </div>
-          <div className="grid grid-cols-2 mt-4 gap-5">
+          <div className="md:grid-cols-2 grid grid-cols-1">
               <TxList title="Latest Blocks" txType="BLOCK" />
               <TxList title="Latest Transactions" txType="TX" />
           </div>
