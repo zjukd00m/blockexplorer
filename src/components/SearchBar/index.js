@@ -17,13 +17,13 @@ function SearchFiltersDropdown({ styles }) {
 
     return (
         <div className={`${styles} rounded-md block w-[170px] relative`}>
-            <div className="flex justify-between border border-gray-600 p-1.5 items-center gap-4 w-full" onClick={() => setIsOpen(!isOpen)}>
+            <div className="flex justify-between border border-slate-300 p-1.5 items-center gap-4 w-full" onClick={() => setIsOpen(!isOpen)}>
                 <p className="text-sm"> { filter } </p>
                 <i className="fa-solid fa-chevron-down fa-xs"></i>
             </div>
             {
                 isOpen ? (
-                    <div className="top-[2rem] z-10 border border-gray-600 absolute bg-white w-full">
+                    <div className="top-[2rem] z-10 border border-slate-200 absolute bg-white w-full">
                         {
                             searchFilters.map((filter_, key) => (
                                 <p key={key} className="text-[0.75rem] hover:bg-blue-400 hover:text-white p-1" onClick={() => {
@@ -99,14 +99,14 @@ export default function SearchBar(props) {
 
     return (
         <div className="w-full bg-white rounded-md p-1 relative">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full">
                 {
                     leftInputItem ? (
-                       <SearchFiltersDropdown styles={"hover:shadow-lg"} /> 
+                       <SearchFiltersDropdown  /> 
                     ) : null
                 }
                 <input 
-                    className={`w-full px-2 py-1 box-border rounded-md active:shadow-lg`} 
+                    className={`w-full px-2 py-1 box-border rounded-md outline-slate-300`} 
                     placeholder={placeholder} 
                     onChange={(e) => setSearchQ(e.target.value)}
                 />

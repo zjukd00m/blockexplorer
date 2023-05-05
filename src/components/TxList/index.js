@@ -35,7 +35,7 @@ export default function TxList(props) {
 
 
     return (
-        <div className="p-4 rounded-lg border border-[#e9ecef]">
+        <div className="p-4 rounded-lg border border-[#e9ecef] bg-white">
             <p className="text-[15px] px-2 py-4"> { title } </p>
             <hr className="bg-[#e9ecef] w-full" />
             {
@@ -48,11 +48,13 @@ export default function TxList(props) {
                     <div className="flex flex-col gap-2 bg-white text-[14.5px]">
                         {
                             itemList?.map((item, index) => {
-                                const { hash, number, miner, from, transactions, to, timestamp, value } = item;
+                                const { hash, number, miner, from, transactions, to, timestamp, value, originalMiner, blockReward } = item;
+
+                                console.log({ blockReward })
 
                                 const timeDiff = getTimeDifferenceInSeconds(new Date(timestamp), new Date());
 
-                                const minedAt = `${timeDiff} seg`;
+                                const minedAt = `${timeDiff} secs ago`;
                                 
                                 return (
                                     <div key={number || hash}>
@@ -82,8 +84,8 @@ export default function TxList(props) {
                                             {
                                                 txType === "BLOCK" ? (
                                                     <>
-                                                        <p className="truncate"> Fee Recipient <span className="text-[#1e40af] cursor-pointer"> {miner} </span> </p>
-                                                        <p className="text-[#1e40af]"> { transactions?.length } txns <span className="text-black"> in 12 secs </span> </p>
+                                                        <p className="truncate"> Fee Recipient <span className="text-[#1e40af] cursor-pointer" onClick={() => navigate(`/address/${originalMiner}`)}> {miner} </span> </p>
+                                                        <p className="text-[#1e40af]"> { transactions?.length } txns </p>
                                                     </>
                                                 ) : (
                                                 <>
@@ -94,7 +96,13 @@ export default function TxList(props) {
                                             } 
                                             </div>
                                             <div className="rounded-md p-1 px-2 border border-slate-300">
-                                                <p className="text-[10.87px] font-semibold"> { `${value} Eth` } </p>
+                                                {
+                                                    txType === "BLOCK" ? (
+                                                        null
+                                                    ) : (
+                                                        <p className="text-[10.87px] font-semibold"> { `${value?.slice(0, 6) || "0.0"} Eth` } </p>
+                                                    )
+                                                }
                                             </div>
                                         </div>
                                         {

@@ -15,6 +15,9 @@ export default function Address() {
         if (!userAddress) return;
 
         (async () => {
+
+            console.log("This is the user address: " + userAddress);
+
             const addressData = await getAddressData(userAddress);
 
             if (!addressData) return;

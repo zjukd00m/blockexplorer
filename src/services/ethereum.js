@@ -122,9 +122,8 @@ export async function getBlocksWithData(amount, beforeBlockNumber) {
             try {
                 // TODO: How to remove the error from here ?
                 const minerENS = await alchemy.core.lookupAddress(block.miner);
-                return { ...block, miner: minerENS || block.miner, value: 0.99 }
+                return { ...block, miner: minerENS || block.miner, originalMiner: block.miner }
             } catch (e) {
-                console.log("Errror")
                 return block;
             }
         }));
@@ -144,12 +143,10 @@ export async function getTxWithData(amount) {
 
         const txWithData = block[0].transactions.slice(0, amount)
             .map((tx) => {
-                const value = Number(Utils.formatUnits(tx.value, "ether"));
-                
                 return {
                     ...tx, 
                     timestamp: block[0].timestamp, 
-                    value: value.toFixed(5),
+                    value: Utils.formatEther(tx.value),
                 }
             });
 
@@ -168,8 +165,6 @@ export async function getTxList(amount, page) {
        if (!block?.length) return null;
 
        let blockTxs = block[0].transactions;
-
-       console.log("I'm here")
 
        if (blockTxs.length < amount) {
             // When the block txs are less than the amount keep asking for blocks
@@ -192,14 +187,10 @@ export async function getTxList(amount, page) {
             }
         }
 
-        console.log("Now, I'm here...")
-
         // Get the sender and receiver tx ENS address
         blockTxs = await Promise.all(blockTxs?.map(async (tx) => {
             let ensFrom = tx.from;
             let ensTo = tx.to;
-
-            
 
             try {
                 ensFrom = await alchemy.core.lookupAddress(tx.from);

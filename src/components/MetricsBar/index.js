@@ -53,7 +53,7 @@ export default function MetricsBar(props) {
     }, []);
 
     return (
-        <div className="grid grid-cols-2 rounded-md bg-slate-200 w-full p-5">
+        <div className="grid grid-cols-2 rounded-lg border border-[#e9ecef] bg-white w-full p-5 shadow-md">
             <div className="flex flex-col p-3 justify-between box-border bg-white">
                 <div className="">
                     <p className="uppercase text-[12px]"> Ether Price </p>

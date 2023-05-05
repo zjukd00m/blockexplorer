@@ -19,10 +19,10 @@ export default function NavbarDropdown({ name, items }) {
                     }
                 </div>
             </div>
-            <div className="relative">
+            <div className="relative" style={{ zIndex: "99" }}>
                 {
                     items?.length && isExpanded ? (
-                        <ul className="flex flex-col bg-white absolute w-[250px] rounded-b-2xl">
+                        <ul className="flex flex-col bg-white absolute w-[250px] rounded-b-2xl z-99">
                             {
                                 items.map(({ name }, key) => (
                                     <li key={key} className="p-1">

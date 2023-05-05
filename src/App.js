@@ -26,7 +26,10 @@ function App() {
       <div className="app-container flex flex-col 2xl:mx-[120px]">
         <TopBar />
         <hr className="bg-[#e9ecef] w-full" />
-        <Navbar />
+        <div className="">
+          <Navbar />
+          <div className="bg-blue-800 w-full -mx-[120px] absolute top-15 left-0 p-10" ></div>
+        </div>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/blocks" element={<Blocks />} />
