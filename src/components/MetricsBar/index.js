@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getAvgGasPrice, getBtcEthPrice, getCurrentEtherPrice, getMarketCap, getTotalTransactions } from "../../services/ethereum";
+import { useNavigate } from "react-router-dom";
+import { getAvgGasPrice, getBtcEthPrice, getCurrentEtherPrice, getLastSafeBlock, getMarketCap } from "../../services/ethereum";
 
 export default function MetricsBar(props) {
     const [avgGasPriceUSD, setAvgGasPriceUSD] = useState(0);
@@ -7,6 +8,9 @@ export default function MetricsBar(props) {
     const [ethPriceUSD, setEthPriceUSD] = useState(0);
     const [marketCap, setMarketCap] = useState(0);
     const [priceChangeLast24H, setPriceChangeLast24H] = useState(0);
+    const [lastSafeBlock, setLastSafeBlock] = useState(null);
+
+    const navigate = useNavigate();
 
     // Get the average gas price
     useEffect(() => {
@@ -36,7 +40,7 @@ export default function MetricsBar(props) {
             const btcEthPrice = await getBtcEthPrice();
 
             const formattedPrice = `${ethPriceUSD} @ ${btcEthPrice.toFixed(5)} BTC`;
-            
+
             setEthPriceUSD(formattedPrice);
             setPriceChangeLast24H(priceChange.toFixed(2));
         })();
@@ -49,15 +53,16 @@ export default function MetricsBar(props) {
 
             setMarketCap(marketCap_);
             
+            setLastSafeBlock(await getLastSafeBlock());
+            
         })();
     }, []);
 
     return (
-        <div className="grid grid-cols-2 rounded-lg border border-[#e9ecef] bg-white w-full p-5 shadow-md">
-            <div className="flex flex-col p-3 justify-between box-border bg-white">
-                <div className="flex items-center gap-3">
-                    <i className="fa-brands fa-ethereum fa-xl"></i>
-                    <div class="flex flex-col">
+        <div className="grid grid-cols-1 gap-10 xl:grid-cols-4 xl:gap-0 rounded-lg border border-[#e9ecef] bg-white w-full p-5 shadow-md">
+            <div className="flex items-center gap-3">
+                <i className="fa-brands fa-ethereum fa-xl"></i>
+                <div class="flex flex-col">
                     <p className="uppercase text-[12px]"> Ether Price </p>
                     { 
                         ethPriceUSD && priceChangeLast24H ? (
@@ -69,44 +74,29 @@ export default function MetricsBar(props) {
                             </p> 
                         ): null 
                     }
-                    </div>
-                </div>
-                <hr className="px-4 w-full" /> 
-                <div className="flex items-center gap-3">
-                    <i className="fa-solid fa-globe fa-xl"></i>
-                    <div className="flex flex-col">
-                        <p className="uppercase text-[12px]"> Market Cap </p>
-                        <p className=""> {`$${marketCap}`} </p>
-                    </div>
                 </div>
             </div>
-            <div className="flex flex-col box-border bg-white">  
-                <div className="flex p-3 box-border justify-between">
-                    <div className="flex items-center gap-3">
-                        <i className="fa-solid fa-server fa-xl"></i>
-                        <div className="flex flex-col">
-                            <p className="uppercase text-[12px]"> Transactions </p>
-                            <p className="text-[15px]"> 1,895.50 M (13.1 TPS) </p>
-                        </div>
-                    </div>
-                    <div className="">
-                        <p className="uppercase text-[12px]"> Med Gas Price </p>
-                        <p className="text-[15px]"> { avgGasPriceWGEI } <span> Gwei </span> </p>
-                    </div>
+            <div className="flex items-center gap-3">
+                <i className="fa-solid fa-globe fa-xl"></i>
+                <div className="flex flex-col">
+                    <p className="uppercase text-[12px]"> Market Cap </p>
+                    <p className=""> {`$${marketCap}`} </p>
                 </div>
-                <hr className="px-4 w-full" /> 
-                <div className="flex p-3 box-border justify-between bg-white">
-                    <div className="flex item-center items-center gap-3">
-                        <i className="fa-regular fa-clock fa-xl"></i>
-                        <div className="flex flex-col">
-                            <p className="uppercase text-[12px]"> Last Finalized Block </p>
-                            <p className="text-[15px]"> 1,895.50 M (13.1 TPS) </p>
-                        </div>
-                    </div>
-                    <div className="">
-                        <p className="uppercase text-[12px]"> Last Safe Block </p>
-                        <p className="text-[15px]"> { avgGasPriceWGEI } </p>
-                    </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <i className="fa-solid fa-gas-pump fa-lg"></i>
+                <div className="">
+                    <p className="uppercase text-[12px]"> Med Gas Price </p>
+                    <p className="text-[15px]"> { avgGasPriceWGEI } <span> Gwei </span> </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <i className="fa-solid fa-cube fa-lg"></i> 
+                <div>
+                    <p className="uppercase text-[12px]"> Last Safe Block </p>
+                    <p className="text-[15px] cursor-pointer text-blue-800" onClick={() => {
+                        lastSafeBlock && navigate(`/block/${lastSafeBlock}`)
+                    }}> { lastSafeBlock } </p>
                 </div>
             </div>
         </div>

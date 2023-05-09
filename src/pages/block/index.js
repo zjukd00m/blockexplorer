@@ -39,7 +39,7 @@ export default function Block() {
         })();
 
         return () => {
-            // setLastBlock(null);
+            setLastBlock(null);
         }
     }, [block]);
     
@@ -53,6 +53,7 @@ export default function Block() {
         else if (blockNumber.startsWith("0x")) getBy = "hash";
 
         (async () => {
+
             const result = await getRawBlockByNumberOrHash(blockNumber, getBy);
 
             if (!result) return;
@@ -95,7 +96,7 @@ export default function Block() {
         })();
 
         return () => {
-            // setBlock(null);
+            setBlock(null);
         }
     }, [blockNumber]);
 

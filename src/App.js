@@ -9,6 +9,7 @@ import Address from "./pages/address";
 import Block from "./pages/block";
 import Transaction from "./pages/transaction";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -19,13 +20,14 @@ import { useEffect, useState } from "react";
 //
 // You can read more about the packages here:
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
+const bgColor = "#111B36";
 
 function App() {
   const [isBlue, setIsBlue] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    console.log(window.location.pathname)
-    if(window.location.pathname === "/") {
+    if(location.pathname === "/") {
       setIsBlue(true);
     } else {
       setIsBlue(false);
@@ -34,7 +36,7 @@ function App() {
     return () => {
       setIsBlue(false);
     }
-  }, [window.location.pathname]);
+  }, [location.pathname]);
 
   return (
     <div className="relative">
@@ -43,7 +45,7 @@ function App() {
         <hr className="bg-[#e9ecef] w-full" />
         <Navbar />
         <div className="-2xl:mx-[120px] -z-10">
-          <div className={`absolute w-full h-[250px] bg-blue-800 left-0 ${!isBlue ? 'bg-white' : null}`}> </div>
+          <div className={`absolute w-full h-[250px] left-0 ${!isBlue ? 'bg-white' : `bg-[${bgColor}]`}`}> </div>
         </div>
         <Routes>
           <Route path="/" element={<Index />} />

@@ -4,7 +4,6 @@ import alchemy from "../utils/alchemyClient";
 
 const ALCHEMY_API_KEY = process.env.REACT_APP_ALCHEMY_API_KEY;
 
-
 export async function searchEthereum(searchQ, searchBy) {
     let res = null;
 
@@ -36,9 +35,16 @@ export async function searchEthereum(searchQ, searchBy) {
         } catch (e) {
             return null;
         }
+    } 
+    else if (searchBy === "RESOLVE_DOMAIN") {
+        try {
+            res = await alchemy.core.resolveName(searchQ);
+        } catch (e) {
+            return null;
+        }
     } else {
         throw new Error("Invalid searchBy value");
-    }
+    } 
 
     return res;
 }
@@ -158,7 +164,6 @@ export async function getTxWithData(amount) {
 
 // Fetch the given amount of tx. If the amount of tx is higher than
 // the ones the first block has, tx are taken from the previous ones
-// TODO: How to implement the pagination ?
 export async function getTxList(amount, page) {
     try {
        // Get one block with the transacion data
@@ -245,7 +250,6 @@ export async function getTxList(amount, page) {
        let highX = lowX + amount - 1;
 
         // When the block txs are more than the amount of txs
-        console.log(blocksTx[0])
         return blocksTx?.sort((txA, txB) => txA.blockNumber - txB.blockNumber).slice(lowX, highX);
 
     } catch (e) {

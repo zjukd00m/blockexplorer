@@ -35,21 +35,19 @@ export default function TxList(props) {
 
 
     return (
-        <div className="p-4 rounded-lg border border-[#e9ecef] bg-white">
+        <div className={"p-4 rounded-lg border border-[#e9ecef] bg-white"}>
             <p className="text-[15px] px-2 py-4"> { title } </p>
             <hr className="bg-[#e9ecef] w-full" />
             {
                 loading ? (
-                    <div className="w-full bg-red-300">
-                        <h1> Hello </h1>
+                    <div className="w-full">
+                        <h4> ...Loading </h4>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2 bg-white text-[14.5px]">
                         {
                             itemList?.map((item, index) => {
-                                const { hash, number, miner, from, transactions, to, timestamp, value, originalMiner, blockReward } = item;
-
-                                console.log({ blockReward })
+                                const { hash, number, miner, from, transactions, to, timestamp, value, originalMiner } = item;
 
                                 const timeDiff = getTimeDifferenceInSeconds(new Date(timestamp), new Date());
 
@@ -57,7 +55,7 @@ export default function TxList(props) {
                                 
                                 return (
                                     <div key={number || hash}>
-                                        <div className="flex items-center justify-between px-2 py-4">
+                                        <div className="flex items-start justify-between px-2 py-4">
                                             <div className="flex items-center gap-4">
                                                 <div className="p-[0.75rem] bg-[#f8f8f4] rounded-md">
                                                 {
@@ -75,7 +73,7 @@ export default function TxList(props) {
                                                         } else {
                                                             navigate(`/tx/${hash}`);
                                                         }
-                                                    }}> { number || hash.slice(0, 20) } </p> 
+                                                    }}> { number || hash?.slice(0, 10) } </p> 
                                                     <p className="text-[12.68px]"> { minedAt } </p> 
                                                 </div>
                                             </div>
