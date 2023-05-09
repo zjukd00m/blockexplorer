@@ -7,11 +7,11 @@ import { getTimeDifferenceInSeconds } from "../../utils/time";
 import { Utils } from "alchemy-sdk";
 import { copy2clipboard } from "../../utils/clipboard";
 
-// TODO: Find out how to get the TX 'method'
+
 export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const [page, setPage] = useState(1);
-    const [rows, setRows] = useState(25);
+    const [rows, setRows] = useState(10);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -21,10 +21,6 @@ export default function Transactions() {
         columnHelper.accessor("hash", {
             header: () => <span> Txn Hash </span>,
             cell: (info) => <Link to={`/tx/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block w-[200px] truncate"> { info.getValue() } </Link>,
-        }),
-        columnHelper.accessor("method", {
-            header: () => <span> Method </span>,
-            cell: (info) => <Link to={`/tx/${info.getValue()}`} className="text-[#1e40af] text-[0.9062rem] block"> { info.getValue() } </Link>,
         }),
         columnHelper.accessor("block", {
             header: () => <span> Block </span>,
@@ -62,13 +58,23 @@ export default function Transactions() {
         })
     ];
 
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set("page", page);
+
+        const newSearch = searchParams.toString();
+        const newUrl = window.location.pathname + "?" + newSearch;
+        
+        window.history.pushState({}, "", newUrl);
+
+    }, [page]);
+
     // Fetch transactions from the service
     useEffect(() => {
         setLoading(true);
         setError(false);
        (async () => {
-            const txs = await getTxList(rows);
-            // const txs = [];
+            const txs = await getTxList(rows, page);
 
             if (!txs?.length) {
                 setLoading(false);
@@ -83,7 +89,6 @@ export default function Transactions() {
 
                 return {
                     hash: tx.hash,
-                    method: "NOP",
                     block: tx.blockNumber,
                     from: tx.from,
                     to: tx.to,

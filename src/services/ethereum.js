@@ -158,37 +158,58 @@ export async function getTxWithData(amount) {
 
 // Fetch the given amount of tx. If the amount of tx is higher than
 // the ones the first block has, tx are taken from the previous ones
+// TODO: How to implement the pagination ?
 export async function getTxList(amount, page) {
     try {
+       // Get one block with the transacion data
        let block = await getBlocksWithData(1);
        
        if (!block?.length) return null;
 
+       // When no transactions, return null
+       if (!block[0].transactions?.length) return null;
+
+       // We are insterested in the block transactions
        let blockTxs = block[0].transactions;
 
-       if (blockTxs.length < amount) {
-            // When the block txs are less than the amount keep asking for blocks
-            while (blockTxs.length < amount) {
-                    const previousBlock = await getBlocksWithData(1, block[0].number); 
+       // Hold all the transactions, from different blocks
+       let blockTxsCount = 0;
+        let blocksTx = [];
+        
+        let looped = false;
 
-                    if (!previousBlock?.length) break;
+        // Iterate while the block transactions count is less than the expected amount
+        // ? -- Does it work properly ?
+        while (blockTxsCount <= amount) {
+            looped = true;
+            // Transaction blocks are not enough to fill the array
+            if (!(blockTxs.length <= amount)) {
+                // Copy the blocksTx content and the block's transactions
+                blocksTx = [...blocksTx, ...blockTxs]; 
 
-                    const prevBlockTxs = previousBlock[0].transactions;
+                // Fetch another block
+                block = await getBlocksWithData(1, block[0].number);
 
-                    // When the previous block length + the current tx length is greater
-                    // than the amount
-                    if (blockTxs.length + prevBlockTxs.length > amount) {
-                        const missingBlocks = prevBlockTxs.slice(0, prevBlockTxs.length - blockTxs.length);
-                        blockTxs = [...blockTxs, ...missingBlocks];
-                    } else {
-                        // Append the previous block txs
-                        blockTxs = [...blockTxs, ...prevBlockTxs];
-                    }
+                blockTxs = block[0].transactions;
+
+                blockTxsCount += blockTxs.length;
+            } else {
+                // Copy the blocksTx content and the block's transactions
+                blocksTx = [...blocksTx, ...blockTxs]; 
+                blockTxsCount += blockTxs.length;
             }
-        }
+       }
 
+       // The block transaction's length is greather than the expected amount
+       if (!looped) {
+            blocksTx = blockTxs;
+       }
+        
+    //    return blocksTx.slice(lowX, highX);
+
+        // --- ! Parse the transactions
         // Get the sender and receiver tx ENS address
-        blockTxs = await Promise.all(blockTxs?.map(async (tx) => {
+        blocksTx = await Promise.all(blocksTx?.map(async (tx) => {
             let ensFrom = tx.from;
             let ensTo = tx.to;
 
@@ -219,8 +240,13 @@ export async function getTxList(amount, page) {
             return { ...tx, from: ensFrom, to: ensTo, timestamp: block[0].timestamp, receipt: txReceipt };
         }));
 
+       // Get the lower and higher index for the block transaction pages
+       let lowX = (page - 1) * amount;
+       let highX = lowX + amount - 1;
+
         // When the block txs are more than the amount of txs
-        return blockTxs?.slice(0, amount);
+        console.log(blocksTx[0])
+        return blocksTx?.sort((txA, txB) => txA.blockNumber - txB.blockNumber).slice(lowX, highX);
 
     } catch (e) {
         return null;

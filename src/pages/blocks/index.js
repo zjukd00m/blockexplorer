@@ -10,7 +10,7 @@ import { Utils } from "alchemy-sdk";
 export default function Blocks() {
     const [blocks, setBlocks] = useState([]);
     const [page, setPage] = useState(1);
-    const [rows, setRows] = useState(25);
+    const [rows, setRows] = useState(10);
     const [lastBlock, setLastBlock] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
@@ -50,6 +50,17 @@ export default function Blocks() {
         //     header: () => <span> Burn Fees (ETH) </span>
         // }),
     ];
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set("page", page);
+
+        const newSearch = searchParams.toString();
+        const newUrl = window.location.pathname + "?" + newSearch;
+        
+        window.history.pushState({}, "", newUrl);
+
+    }, [page]);
 
     useEffect(() => {
         setLoading(true);

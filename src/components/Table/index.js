@@ -80,7 +80,7 @@ export default function Table({
                     <select 
                         value={rows} 
                         className="bg-[#f8f9fa] border border-gray-200 rounded-md px-2 py-2 focus:border-none"
-                        onChange={(e) => onRowSelect(e.target.value)}
+                        onChange={(e) => onRowSelect(+e.target.value)}
                     >
                         <option> 10 </option>
                         <option> 25 </option>

@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Address from "./pages/address";
 import Block from "./pages/block";
 import Transaction from "./pages/transaction";
+import { useEffect, useState } from "react";
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -20,15 +21,29 @@ import Transaction from "./pages/transaction";
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 
 function App() {
+  const [isBlue, setIsBlue] = useState(false);
+
+  useEffect(() => {
+    console.log(window.location.pathname)
+    if(window.location.pathname === "/") {
+      setIsBlue(true);
+    } else {
+      setIsBlue(false);
+    }
+
+    return () => {
+      setIsBlue(false);
+    }
+  }, [window.location.pathname]);
 
   return (
-    <div className="">
+    <div className="relative">
       <div className="app-container flex flex-col 2xl:mx-[120px]">
         <TopBar />
         <hr className="bg-[#e9ecef] w-full" />
-        <div className="">
-          <Navbar />
-          <div className="bg-blue-800 w-full -mx-[120px] absolute top-15 left-0 p-10" ></div>
+        <Navbar />
+        <div className="-2xl:mx-[120px] -z-10">
+          <div className={`absolute w-full h-[250px] bg-blue-800 left-0 ${!isBlue ? 'bg-white' : null}`}> </div>
         </div>
         <Routes>
           <Route path="/" element={<Index />} />

@@ -112,7 +112,7 @@ export default function SearchBar(props) {
                 />
                 {
                     rightInputItem ? (
-                        <div className="bg-blue-800 p-1 rounded-md text-white">
+                        <div className="bg-red-400 p-1 rounded-md text-white">
                             <i className="fa-solid fa-magnifying-glass p-1 hover:opacity-70"></i>
                         </div>
                     ) : null
